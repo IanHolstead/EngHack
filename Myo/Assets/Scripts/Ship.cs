@@ -18,6 +18,14 @@ public class Ship : MonoBehaviour {
     public GameObject myo = null;
 	public GameObject starDustPrefab = null;
 
+    public DustTypes getType() {
+        return type;
+    }
+
+    public void setType(DustTypes type) {
+        this.type = type;
+    }
+
     Vector3 pos = new Vector3();
     float rotation = 0f;
 	private Pose _lastPose = Pose.Rest;
@@ -73,7 +81,7 @@ public class Ship : MonoBehaviour {
 	}
 
     void OnTriggerEnter(Collider otherObj) {
-        if (otherObj.gameObject.name == "StarDust") {
+        if (otherObj.gameObject.tag == "Dust") {
             this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
             this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
         }
