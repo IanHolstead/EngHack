@@ -6,6 +6,7 @@ public class UIDriver : MonoBehaviour {
     private int difficulty = 1;
     private GameState state;
     private bool endGame = true;
+	private int shipsReady = 0;
 
     public enum GameState
     {
@@ -29,6 +30,7 @@ public class UIDriver : MonoBehaviour {
         state = GameState.START;
         showStateText("Punch The Screen\nTo Begin");
         showHUD(false);
+		showPlayerStatusTexts ("NOT READY", "NOT READY");
         showGateWarning(false);
 
         GetComponent<Nemesis>().Cleared += new Nemesis.SectionCleared(updatePassWall);
@@ -60,6 +62,7 @@ public class UIDriver : MonoBehaviour {
 
     private void resetLevel()
     {
+		shipsReady = 0;
         state = GameState.END;
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
@@ -76,43 +79,56 @@ public class UIDriver : MonoBehaviour {
         GameObject.Find("State text").GetComponent<TextMesh>().text = text;
     }
 
+	public void showPlayerStatusTexts(string player1, string player2) {
+		GameObject.Find ("Player 1 life text").GetComponent<TextMesh> ().text = player1;
+		GameObject.Find ("Player 2 life text").GetComponent<TextMesh> ().text = player2;
+		print ("show");
+	}
+
+	public void shipReady(Ship ship) {
+		if (ship == GameObject.Find ("Player1").GetComponent<Ship> ()) {
+			showPlayerStatusTexts("READY", "NOT READY");
+		} else {
+			showPlayerStatusTexts("NOT READY", "READY");
+		}
+
+		++shipsReady;
+		if (shipsReady == 2) {
+			showStateText ("");
+			showHUD (true);
+		}
+	}
+
     public void showHUD(bool visible)
     {
-        if (visible)
-        {
-            if (state != GameState.PLAYING)
-            {
-                startLevel(gameObject);
-            }
-            GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + GameObject.Find("Player1").GetComponent<Ship> ().Life.ToString();
-            GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "P2 Life: " + GameObject.Find("Player2").GetComponent<Ship>().Life.ToString();
-            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "Next Gate:";
-        }
-        else
-        {
-            if (state == GameState.PLAYING)
-            {
-                resetLevel();
-            }
-            GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "";
-            GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "";
-            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "";
-        }
+		if (visible) {
+			showStateText("");
+			if (state != GameState.PLAYING) {
+				startLevel (gameObject);
+			}
+			GameObject.Find ("Player 1 life text").GetComponent<TextMesh> ().text = "P1 Life: " + GameObject.Find ("Player1").GetComponent<Ship> ().Life.ToString ();
+			GameObject.Find ("Player 2 life text").GetComponent<TextMesh> ().text = "P2 Life: " + GameObject.Find ("Player2").GetComponent<Ship> ().Life.ToString ();
+			GameObject.Find ("Gate text").GetComponent<TextMesh> ().text = "Next Gate:";
+		} else {
+			if (state == GameState.PLAYING) {
+				resetLevel ();
+			}
+			GameObject.Find ("Player 1 life text").GetComponent<TextMesh> ().text = "";
+			GameObject.Find ("Player 2 life text").GetComponent<TextMesh> ().text = "";
+			GameObject.Find ("Gate text").GetComponent<TextMesh> ().text = "";
+			print ("clear");
+		}
 
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("HUD"))
-        {
-            Color colour = obj.GetComponent<Renderer>().material.color;
-            if (visible)
-            {
-                colour.a = 1;
-            }
-            else
-            {
-                colour.a = 0;
-            }
+		foreach (GameObject obj in GameObject.FindGameObjectsWithTag("HUD")) {
+			Color colour = obj.GetComponent<Renderer> ().material.color;
+			if (visible) {
+				colour.a = 1;
+			} else {
+				colour.a = 0;
+			}
 
-            obj.GetComponent<Renderer>().material.color = colour;
-        }
+			obj.GetComponent<Renderer> ().material.color = colour;
+		}
     }
 
     public void showGateWarning(bool visible)

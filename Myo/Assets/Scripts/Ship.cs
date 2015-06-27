@@ -29,6 +29,8 @@ public class Ship : MonoBehaviour {
     public GameObject myo = null;
 	public GameObject opposingShip = null;
 
+	private bool isReady;
+
     private List<Rigidbody> collidingObjects = new List<Rigidbody>();
 	private Rigidbody heldObject = null;
 	private float holdRequestInitateTime;
@@ -65,13 +67,11 @@ public class Ship : MonoBehaviour {
     void Start () {
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
 		_lastPose = thalmicMyo.pose;
+		isReady = false;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKeyDown ("r")) {
-			recenterShipPosition();
-		}
 
 		Vector3 targetPos = calculateShipPosition ();
 		Vector3 dist = targetPos - transform.position;
@@ -94,6 +94,9 @@ public class Ship : MonoBehaviour {
 		
 
 		//check for pose changes
+		if (Input.GetKeyDown ("r")) {
+			recenterShipPosition();
+		}
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
 		if (thalmicMyo != null && _lastPose != thalmicMyo.pose) {
 			_lastPose = thalmicMyo.pose;
@@ -102,10 +105,15 @@ public class Ship : MonoBehaviour {
 			switch(_lastPose) {
 			case Pose.Fist:
 				print ("fist boys");
-				if (heldObject != null) {
-					throwHeldObject ();
+				if (!isReady) {
+					isReady = true;
+					recenterShipPosition();
 				} else {
-					holdRequestInitateTime = Time.realtimeSinceStartup;
+					if (heldObject != null) {
+						throwHeldObject ();
+					} else {
+						holdRequestInitateTime = Time.realtimeSinceStartup;
+					}
 				}
 				break;
 			case Pose.WaveIn:
@@ -238,8 +246,9 @@ public class Ship : MonoBehaviour {
 		_myoAntiYaw = eulerAngles [1];
         if (GameObject.Find("Spawner").GetComponent<UIDriver>().State != UIDriver.GameState.PLAYING)
         {
-            GameObject.Find("Spawner").GetComponent<UIDriver>().showStateText("");
-            GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(true);
+//            GameObject.Find("Spawner").GetComponent<UIDriver>().showStateText("");
+//            GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(true);
+			GameObject.Find("Spawner").GetComponent<UIDriver>().shipReady(this);
         }
 	}
 
