@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class StarDust : MonoBehaviour {
-	const float DRIFSPEED = -1;
+	const float DRIFSPEED = -0.3f;
 
 	
 
@@ -50,8 +50,10 @@ public class StarDust : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision otherObj) {
+		Debug.Log ("co");
 
 		if (otherObj.gameObject.name == "DeathWall") {
+			Debug.Log ("death");
 			Destroy(this.gameObject);
 		}
 	}
