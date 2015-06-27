@@ -49,20 +49,34 @@ public class Ship : MonoBehaviour {
 
 		//check for pose changes
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
-//		StarDust dust;
-		if (_lastPose != thalmicMyo.pose) {
+		if (thalmicMyo != null && _lastPose != thalmicMyo.pose) {
 			_lastPose = thalmicMyo.pose;
+
+			GameObject dust;
 			switch(_lastPose) {
 			case Pose.Fist:
 				print ("fist boys");
 				break;
 			case Pose.WaveIn:
 				print ("wave in boys");
-//				dust = (StarDust) Instantiate(starDustPrefab, transform.position, transform.rotation);
+				dust = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				dust.transform.position = transform.position;
+				dust.transform.rotation = transform.rotation;
+				Vector3 throwDir = new Vector3(-Mathf.Cos(roll*Mathf.PI/180), -Mathf.Sin (roll*Mathf.PI/180), 0);
+				float throwVelocity = 50.0f;
+				dust.AddComponent<Rigidbody>().AddForce(throwDir * throwVelocity, ForceMode.VelocityChange);
 				break;
 			case Pose.WaveOut:
 				print ("wave out boys");
-//				dust = (StarDust) Instantiate(starDustPrefab, transform.position, transform.rotation);
+				dust = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				dust.transform.position = transform.position;
+				dust.transform.rotation = transform.rotation;
+				throwDir = new Vector3(Mathf.Cos(roll*Mathf.PI/180), Mathf.Sin (roll*Mathf.PI/180), 0);
+				throwVelocity = 50.0f;
+				dust.AddComponent<Rigidbody>().AddForce(throwDir * throwVelocity, ForceMode.VelocityChange);
+				break;
+			case Pose.DoubleTap:
+				recenterShipPosition();
 				break;
 			default:
 				break;
