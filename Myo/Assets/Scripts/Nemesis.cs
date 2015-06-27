@@ -132,7 +132,6 @@ public class Nemesis : MonoBehaviour {
 		StarDust script = newDust.GetComponent<StarDust> ();
 		script.DustType = type;
 		script.Velocity = velocity;
-		script.startDrift ();
 		script.spin ();
 		Debug.Log ("spawn");
 
@@ -164,6 +163,6 @@ public class Nemesis : MonoBehaviour {
     void SpawnWall()
     {
         GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, 200), transform.rotation);
-        passWallInstance.GetComponent<PassWall>().Setup(nextPassWallType, endOnFailTest, velocity);
+        passWallInstance.GetComponent<PassWall>().Setup(nextPassWallType, endOnFailTest, velocity.z);
     }
 }
