@@ -25,8 +25,10 @@ public class Nemesis : MonoBehaviour {
 	public List<GameObject> dust = new List<GameObject>();
 	public List<GameObject> passWalls = new List<GameObject>();
 	public List<Plan> plans = new List<Plan> ();
+	public List<GameObject> fakeDusts = new List<GameObject> ();
 
 	public GameObject startDust = null;
+	public GameObject startFakeDust = null;
     public GameObject passWall;
 
     public Vector3 velocity;
@@ -34,18 +36,23 @@ public class Nemesis : MonoBehaviour {
 
 
 	public void createLevel(int dif){
-
+		sprinkleFakeDust ();
 		float zset = 100;
 		for (int i = 0; i <3; ++i) {
 			createSector(ref zset, dif);
 		}
 
 	}
-
+	public void changeSpeed(Vector3 vel){
+		setFakeDustVel (vel);
+		velocity = vel;
+	}
 	public void createSector(ref float zset, int dif){
 		DustTypes pass = (DustTypes)Random.Range(0,3);
 		float start = zset;
 		DustTypes[] failing = failingTypes (pass);
+
+		changeSpeed (new Vector3(0,0,-(15 + 4 * dif)));
 
 		if (plans.Count > 0) {
 			for (int i = 0; i <10; ++i) {
@@ -54,13 +61,17 @@ public class Nemesis : MonoBehaviour {
 
 		}
 
-		for (int i = 0; i <5; ++i) {
+		int pspawns = Mathf.Max (3, 10 - dif);
+
+		for (int i = 0; i <pspawns; ++i) {
 			spawnDust(pass,new Vector3(Random.Range(-10.0f,10.0f),
 			                           Random.Range(-5.0f,5.0f),
 			                           Random.Range(start,zset)));
 		}
 
-		for (int i = 0; i <40; ++i) {
+		int dspawns = Mathf.Min (70, 30 + 4 * dif);
+
+		for (int i = 0; i <dspawns; ++i) {
 			spawnDust(failing[Random.Range(0,failing.Length)],new Vector3(Random.Range(-10.0f,10.0f),
 			                                                   				Random.Range(-5.0f,5.0f),
 			                                                   				Random.Range(start,zset)));
@@ -95,7 +106,7 @@ public class Nemesis : MonoBehaviour {
 				max = dust.pos.z;
 		}
 
-		max += 20;
+		max += 40;
 
 		zset += max;
 	}
@@ -190,8 +201,31 @@ public class Nemesis : MonoBehaviour {
 		script.spin ();
 
 	}
+	public void spawnFakeDust(){
+		GameObject newDust = (GameObject)Instantiate(startFakeDust);
+		fakeDusts.Add (newDust);
+		
+	}
+
+	public void setFakeDustVel(Vector3 vel){
+		foreach (GameObject dustish in fakeDusts) {
+			dustish.GetComponent<FakeDust>().vel = vel;
+		}
+	}
+
+	public void removeFakeDust(){
+		foreach (GameObject dustish in fakeDusts) {
+			Destroy (dustish);
+		}
+	}
+
 	void dustRemoved (GameObject sender){
 		dust.Remove (sender);
+	}
+
+	public void sprinkleFakeDust(){
+		for (int i = 0; i < 100; ++i)
+			spawnFakeDust ();
 	}
 
 	public void removeAllDust(){
@@ -211,6 +245,7 @@ public class Nemesis : MonoBehaviour {
 	public void removeAll(){
 		removeAllDust ();
 		removeAllPassWalls ();
+		removeFakeDust ();
 	}
 
 	// Use this for initialization

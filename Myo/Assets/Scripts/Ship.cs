@@ -14,12 +14,14 @@ public class Ship : MonoBehaviour {
 	private readonly float MAX_VELOCITY = 80.0f;
 	private readonly float MAX_ACCEL = 400.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
+
+	private readonly float COLLISION_RADIUS = 1.1f;
     
     private DustTypes type = DustTypes.CUBE;
     private int life = 3;
     private bool lockLife = false;
 
-	private readonly float HOLD_TIME_LENIENCY = 2.0f;
+	private readonly float HOLD_TIME_LENIENCY = 3.0f;
 	private readonly float HOLD_DISTANCE = 1.0f;
 	private readonly float HOLD_VELOCITY_FACTOR = 0.2f;
 	private readonly float THROW_VELOCITY = 10.0f;
@@ -117,6 +119,7 @@ public class Ship : MonoBehaviour {
 	void throwHeldObject() {
 		if (heldObject != null) {
 			Vector3 direction = heldObject.transform.position - transform.position;
+			direction[2] = 0;
 			heldObject.GetComponent<Rigidbody>().velocity = direction / direction.magnitude * THROW_VELOCITY;
 			heldObject = null;
 		}
@@ -135,11 +138,15 @@ public class Ship : MonoBehaviour {
 	void OnTriggerEnter(Collider otherObj) {
 		if (otherObj.gameObject.tag == "Dust") {
 			collidingObjects.Add(otherObj.attachedRigidbody);
-			if (heldObject == null && 
-			   		Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+			Vector3 xyzDist = GetComponent<Rigidbody>().transform.position - otherObj.attachedRigidbody.transform.position;
+//			xyDist[2] = 0;
+			print (string.Format ("xyz dist mag: {0}", xyzDist.magnitude));
+			if (heldObject == null
+			    && Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+			    //&& xyzDist.magnitude > COLLISION_RADIUS) {
 				print ("grabbed star dust");
 				heldObject = otherObj.attachedRigidbody;
-			} else {
+			} else if (xyzDist.magnitude <= COLLISION_RADIUS){
 				this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
 				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
 				Destroy (otherObj.gameObject);
