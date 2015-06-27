@@ -8,18 +8,15 @@ using VibrationType = Thalmic.Myo.VibrationType;
 
 public class Ship : MonoBehaviour {
 
-	private const float MAX_YAW = 45.0f;
-	private const float MAX_PITCH = 45.0f;
-	private const float MAX_VELOCITY = 3.0f;
+	private readonly float MAX_YAW = 45.0f;
+	private readonly float MAX_PITCH = 45.0f;
+	private readonly float MAX_VELOCITY = 3.0f;
+	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
 
     public GameObject myo = null;
 
-    public Vector3 maxPos = new Vector3(10f, 5.5f, 0f);
-
     Vector3 pos = new Vector3();
     float rotation = 0f;
-
-    Pose baseLocation;
 
 	//Myo math variables
 	private float _myoAntiYaw = 0.0f;
@@ -44,6 +41,9 @@ public class Ship : MonoBehaviour {
 			pos = targetPos;
 		}
 		transform.position = pos;
+
+		float roll = calculateShipRoll ();
+		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
 	}
 
 	Vector3 calculateShipPosition() {
@@ -53,31 +53,44 @@ public class Ship : MonoBehaviour {
 		float pitch = normalizeAngle(eulerAngles[0]);
 		float yaw = normalizeAngle(eulerAngles[1] - _myoAntiYaw);
 
-		float x = maxPos [0] * yaw / MAX_YAW;
-		if (x > maxPos [0]) {
-			x = maxPos [0];
-		} else if (x < -maxPos [0]) {
-			x = -maxPos [0];
-		}
+		float x = MAX_POS [0] * yaw / MAX_YAW;
+		x = clampValue (x, -MAX_POS [0], MAX_POS [0]);
 		
-		float y = -maxPos [1] * pitch / MAX_PITCH;
-		if (y > maxPos [1]) {
-			y = maxPos [1];
-		} else if (y < -maxPos [1]) {
-			y = -maxPos [1];
-		}
+		float y = -MAX_POS [1] * pitch / MAX_PITCH;
+		y = clampValue (y, -MAX_POS [1], MAX_POS [1]);
 		print(string.Format("x and y: {0}, {1} (p={2}, y={3})", x, y, pitch, yaw));
 		return new Vector3 (x, y, 0.0f);
 	}
 
+	float calculateShipRoll() {
+		// Current zero roll vector and roll value.
+		Vector3 zeroRoll = computeZeroRollVector (myo.transform.forward);
+		float absRoll = rollFromZero (zeroRoll, myo.transform.forward, myo.transform.up);
+		return absRoll - _myoReferenceRoll;
+	}
+	
+
 	void recenterShipPosition() {
+		Vector3 zeroRoll = computeZeroRollVector (myo.transform.forward);
+		_myoReferenceRoll = rollFromZero (zeroRoll, myo.transform.forward, myo.transform.up);
+
 		Vector3 eulerAngles = myo.transform.eulerAngles;
-		_myoReferenceRoll = eulerAngles [2];
 		_myoAntiYaw = eulerAngles [1];
 	}
 
 	//Myo math functions
 
+
+	float clampValue(float val, float min, float max) {
+		if (val > max) {
+			return max;
+		} 
+		if (val < min) {
+			return min;
+		}
+		return val;
+	}
+		
 	// Compute the angle of rotation clockwise about the forward axis relative to the provided zero roll direction.
 	// As the armband is rotated about the forward axis this value will change, regardless of which way the
 	// forward vector of the Myo is pointing. The returned value will be between -180 and 180 degrees.
