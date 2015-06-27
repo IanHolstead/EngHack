@@ -13,6 +13,8 @@ public class Ship : MonoBehaviour {
 	private readonly float MAX_PITCH = 45.0f;
 	private readonly float MAX_VELOCITY = 3.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
+    
+    private DustTypes type = DustTypes.CUBE;
 
 	private readonly float HOLD_TIME_LENIENCY = 1.0f;
 
@@ -25,6 +27,15 @@ public class Ship : MonoBehaviour {
 	private float holdRequestInitateTime;
 	private float holdStartTime;
 	private bool holdRequestIsActive;
+
+
+    public DustTypes getType() {
+        return type;
+    }
+
+    public void setType(DustTypes type) {
+        this.type = type;
+    }
 
     Vector3 pos = new Vector3();
     float rotation = 0f;
@@ -129,6 +140,11 @@ public class Ship : MonoBehaviour {
 			print ("grabbed star dust");
 			heldStarDust = null;
 		}
+
+		if (otherObj.gameObject.tag == "Dust") {
+			this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
+			this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
+		}
 	}
 
 	void OnTriggerExit(Collider otherObj) {
@@ -137,8 +153,6 @@ public class Ship : MonoBehaviour {
 		collidingObjects.Remove (otherObj.attachedRigidbody);
 //		}
 	}
-
-	// calculations
 
 	Vector3 calculateShipPosition() {
 
@@ -150,7 +164,7 @@ public class Ship : MonoBehaviour {
 		float x = MAX_POS [0] * yaw / MAX_YAW;
 		x = clampValue (x, -MAX_POS [0], MAX_POS [0]);
 		
-		float y = MAX_POS [1] * pitch / MAX_PITCH;
+		float y = -MAX_POS [1] * pitch / MAX_PITCH;
 		y = clampValue (y, -MAX_POS [1], MAX_POS [1]);
 //		print(string.Format("x and y: {0}, {1} (p={2}, y={3})", x, y, pitch, yaw));
 		return new Vector3 (x, y, 0.0f);

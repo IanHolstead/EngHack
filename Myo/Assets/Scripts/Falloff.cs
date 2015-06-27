@@ -27,13 +27,15 @@ public class Falloff : MonoBehaviour {
         float distanceToCamera = Mathf.Abs(PlayerCamera.transform.position.z - transform.position.z);
         if (distanceToCamera <= 100f)
         {
+            print("1");
             return 1f;
         }
         else if(distanceToCamera <= 200)
         {
+            print(1f - ((distanceToCamera - visibleDistance) / 100));
             return 1f - ((distanceToCamera - visibleDistance) / 100);
         }
-
+        print("0");
         return 0f;
     }
 }
