@@ -56,7 +56,7 @@ public class StarDust : MonoBehaviour {
 
 	void OnTriggerEnter(Collider otherObj) {
 
-		if (otherObj.gameObject.name == "DeathWall") {
+		if (otherObj.gameObject.tag == "DeathWall") {
 			Destroy(this.gameObject);
 			if (Removed != null)
 				Removed(this.gameObject);
