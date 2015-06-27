@@ -14,9 +14,11 @@ public class Ship : MonoBehaviour {
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
 
     public GameObject myo = null;
+	public GameObject starDustPrefab = null;
 
     Vector3 pos = new Vector3();
     float rotation = 0f;
+	private Pose _lastPose = Pose.Rest;
 
 	//Myo math variables
 	private float _myoAntiYaw = 0.0f;
@@ -24,7 +26,8 @@ public class Ship : MonoBehaviour {
     
     // Use this for initialization
     void Start () {
-	    
+		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
+		_lastPose = thalmicMyo.pose;
 	}
 	
 	// Update is called once per frame
@@ -42,8 +45,31 @@ public class Ship : MonoBehaviour {
 		}
 		transform.position = pos;
 
+
 		float roll = calculateShipRoll ();
 		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
+
+		//check for pose changes
+		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
+//		StarDust dust;
+		if (_lastPose != thalmicMyo.pose) {
+			_lastPose = thalmicMyo.pose;
+			switch(_lastPose) {
+			case Pose.Fist:
+				print ("fist boys");
+				break;
+			case Pose.WaveIn:
+				print ("wave in boys");
+//				dust = (StarDust) Instantiate(starDustPrefab, transform.position, transform.rotation);
+				break;
+			case Pose.WaveOut:
+				print ("wave out boys");
+//				dust = (StarDust) Instantiate(starDustPrefab, transform.position, transform.rotation);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	Vector3 calculateShipPosition() {
@@ -58,7 +84,7 @@ public class Ship : MonoBehaviour {
 		
 		float y = -MAX_POS [1] * pitch / MAX_PITCH;
 		y = clampValue (y, -MAX_POS [1], MAX_POS [1]);
-		print(string.Format("x and y: {0}, {1} (p={2}, y={3})", x, y, pitch, yaw));
+//		print(string.Format("x and y: {0}, {1} (p={2}, y={3})", x, y, pitch, yaw));
 		return new Vector3 (x, y, 0.0f);
 	}
 
