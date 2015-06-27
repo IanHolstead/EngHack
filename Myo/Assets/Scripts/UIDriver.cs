@@ -14,9 +14,10 @@ public class UIDriver : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if(true){
-        //if(prevPassWall != GameObject.Find("Spawner").GetComponent<Nemesis> ().) {//TODO: check if the next pass wall in the list is of the same type, if it is not then update the visible warning
-            //TODO: prevPassWall =  new pass wall type
+
+        if (prevPassWall != GameObject.Find("Spawner").GetComponent<Nemesis>().passWalls[0].GetComponent<PassWall> ().type)
+        {
+            prevPassWall = GameObject.Find("Spawner").GetComponent<Nemesis>().passWalls[0].GetComponent<PassWall>().type;
             showGateWarning(prevPassWall, true);
         }
 
