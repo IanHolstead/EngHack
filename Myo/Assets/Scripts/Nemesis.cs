@@ -27,6 +27,7 @@ public class Nemesis : MonoBehaviour {
     public Vector3 velocity = new Vector3 (0, 0, -5);
 
 
+
 	public void createLevel(int dif){
 
 		float zset = 100;
@@ -178,23 +179,6 @@ public class Nemesis : MonoBehaviour {
 		loadPlans ();
 		createLevel (3);
 	}
-	
-	// Update is called once per frame
-	/*void Update () {
-        if (passWalls.Count != 0)
-        {
-            timeSinceWall = 0f;
-        }
-        else
-        {
-            timeSinceWall += Time.deltaTime;
-            if (timeSinceWall > wallSpawnTime)
-            {
-                
-            }
-        }
-        
-	}*/
 
 	void SpawnWall(DustTypes passWallType, float zset)
     {
