@@ -2,12 +2,11 @@
 using System.Collections;
 
 public class StarDust : MonoBehaviour {
-	Vector3 DRIFVEL = new Vector3(0, 0, -0.1f);
-
+	Vector3 DRIFVEL = new Vector3();
 	
+	public Mesh CUBE = null, SPERE = null, TRIANGLE = null;
 
-	public Mesh CUBE = null,SPERE = null,TRIANGLE = null;
-
+    public Vector3 vel = new Vector3();
 
 	public Mesh findMesh(DustTypes dustType){
 		switch (dustType) {
@@ -34,10 +33,6 @@ public class StarDust : MonoBehaviour {
 		}
 	}
 
-	public Vector3 vel = new Vector3();
-	
-	
-
 	public void startDrift(){
 		vel = DRIFVEL;
 	}
@@ -53,4 +48,9 @@ public class StarDust : MonoBehaviour {
 			Destroy(this.gameObject);
 		}
 	}
+
+    public void SetVelocity(float velocity)
+    {
+        DRIFVEL = new Vector3(0, 0, velocity);
+    }
 }

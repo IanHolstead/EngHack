@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class PassWall : MonoBehaviour {
 
@@ -29,14 +29,19 @@ public class PassWall : MonoBehaviour {
 
     void TestEndGame()
     {
-        foreach (GameObject ship in GameObject.FindGameObjectsWithTag("Player"))
+        foreach (Ship ship in FindObjectsOfType(typeof(Ship)))
         {
-            //if ((Ship)ship.type != type) {YOU DONE};
+            //if (ship.type != type)
+            //{
+
+            //}
         }
     }
 
-    void SetType(DustTypes dustType)
+    public void Setup(DustTypes dustType, bool leathal, float velocity)
     {
         type = dustType;
+        endGame = leathal;
+        this.velocity = velocity;
     }
 }
