@@ -75,10 +75,14 @@ public class Ship : MonoBehaviour {
 
 		Vector3 targetPos = calculateShipPosition ();
 		Vector3 dist = targetPos - transform.position;
-		Vector3 finalVelocity;
-		float velocityFactor = (heldObject == null)? 1.0f : HOLD_VELOCITY_FACTOR;
-		velocityFactor *= (1 - Mathf.Exp(-dist.magnitude));
-		GetComponent<Rigidbody>().velocity = dist / dist.magnitude * MAX_VELOCITY * velocityFactor;
+		if (dist.sqrMagnitude > 1e-6) {
+			Vector3 finalVelocity;
+			float velocityFactor = (heldObject == null) ? 1.0f : HOLD_VELOCITY_FACTOR;
+			velocityFactor *= (1 - Mathf.Exp (-dist.magnitude));
+			GetComponent<Rigidbody> ().velocity = dist / dist.magnitude * MAX_VELOCITY * velocityFactor;
+		} else {
+			GetComponent<Rigidbody> ().velocity = Vector3.zero;
+		}
 
 		float roll = calculateShipRoll ();
 		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
