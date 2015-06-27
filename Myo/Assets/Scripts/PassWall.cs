@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class PassWall : MonoBehaviour {
 
     public float velocity = 0.1f;
-    DustTypes type;
+    public DustTypes type;
     bool endGame = true;
 	
     // Use this for initialization

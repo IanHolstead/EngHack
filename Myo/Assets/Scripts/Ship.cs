@@ -11,7 +11,7 @@ public class Ship : MonoBehaviour {
 
 	private readonly float MAX_YAW = 45.0f;
 	private readonly float MAX_PITCH = 45.0f;
-	private readonly float MAX_VELOCITY = 40.0f;
+	private readonly float MAX_VELOCITY = 80.0f;
 	private readonly float MAX_ACCEL = 400.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
     
@@ -60,7 +60,6 @@ public class Ship : MonoBehaviour {
     
     // Use this for initialization
     void Start () {
-        showStartText(true);
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
 		_lastPose = thalmicMyo.pose;
 	}
@@ -72,19 +71,20 @@ public class Ship : MonoBehaviour {
 		}
 
 		Vector3 targetPos = calculateShipPosition ();
-		Vector3 accelTick = targetPos - transform.position;
-		if (accelTick.magnitude > MAX_ACCEL * Time.deltaTime) {
-			accelTick = accelTick * accelTick.magnitude / (MAX_ACCEL * Time.deltaTime);
-		}
-		GetComponent<Rigidbody> ().AddForce (accelTick, ForceMode.VelocityChange);
-		Vector3 finalVelocity = GetComponent<Rigidbody> ().velocity;
-		if (finalVelocity.sqrMagnitude > MAX_VELOCITY * MAX_VELOCITY) {
-			finalVelocity = finalVelocity / finalVelocity.magnitude * MAX_VELOCITY;
-		}
-		if (heldObject != null) {
-			finalVelocity *= HOLD_VELOCITY_FACTOR;
-		}
-		GetComponent<Rigidbody> ().velocity = finalVelocity;
+//		Vector3 accelTick = targetPos - transform.position;
+//		if (accelTick.magnitude > MAX_ACCEL * Time.deltaTime) {
+//			accelTick = accelTick * accelTick.magnitude / (MAX_ACCEL * Time.deltaTime);
+//		}
+//		GetComponent<Rigidbody> ().AddForce (accelTick, ForceMode.VelocityChange);
+//		Vector3 finalVelocity = GetComponent<Rigidbody> ().velocity;
+//		if (finalVelocity.sqrMagnitude > MAX_VELOCITY * MAX_VELOCITY) {
+//			finalVelocity = finalVelocity / finalVelocity.magnitude * MAX_VELOCITY;
+//		}
+		Vector3 dist = targetPos - transform.position;
+		Vector3 finalVelocity;
+		float velocityFactor = (heldObject == null)? 1.0f : HOLD_VELOCITY_FACTOR;
+		velocityFactor *= (1 - Mathf.Exp(-dist.magnitude));
+		GetComponent<Rigidbody>().velocity = dist / dist.magnitude * MAX_VELOCITY * velocityFactor;
 
 		float roll = calculateShipRoll ();
 		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
@@ -138,7 +138,6 @@ public class Ship : MonoBehaviour {
 	// events
 
 	void OnTriggerEnter(Collider otherObj) {
-		
 		if (otherObj.gameObject.tag == "Dust") {
 			collidingObjects.Add(otherObj.attachedRigidbody);
 			if (heldObject == null && 
@@ -150,7 +149,30 @@ public class Ship : MonoBehaviour {
 				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
 				Destroy (otherObj.gameObject);
 			}
-		}
+        }
+        else if (otherObj.gameObject.tag == "PassWall")
+        {
+            if (type != otherObj.GetComponent<PassWall>().type)
+            {
+                life--;
+                if (life <= 0)
+                {
+                    if ((GameObject.Find("Player1").GetComponent<Ship>().Life <= 0))
+                    {
+                        GameObject.Find("Spawner").GetComponent<UIDriver>().showEndText(true);
+                    }
+                    else
+                    {
+                        GameObject.Find("Spawner").GetComponent<UIDriver>().showEndText(false);
+                    }
+                    GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(false);
+                }
+                else
+                {
+                    GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(true);
+                }
+            }
+        }
 	}
 
 	void OnTriggerExit(Collider otherObj) {
@@ -189,7 +211,8 @@ public class Ship : MonoBehaviour {
 
 		Vector3 eulerAngles = myo.transform.eulerAngles;
 		_myoAntiYaw = eulerAngles [1];
-        showStartText(false);
+        GameObject.Find("Spawner").GetComponent<UIDriver> ().clearStateText();
+        GameObject.Find("Spawner").GetComponent<UIDriver> ().showHUD(true);
 	}
 
 	//Myo math functions
@@ -251,57 +274,4 @@ public class Ship : MonoBehaviour {
 		}
 		return angle;
 	}
-
-
-    //UI work
-    private void showStartText(bool visible) {
-        if (visible) {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "Punch The Screen\nTo Begin";
-        } else {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "";
-        }
-        showHUD(!visible);
-    }
-
-    private void showHUD(bool visible) {
-        if (visible) {
-            if (gameObject.name == "Player1") {
-                GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + life.ToString();
-            } else {
-                GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "P1 Life: " + life.ToString();
-            }
-            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "Next Gate:";
-        } else {
-            GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "";
-            GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "";
-            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "";
-        }
-
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("HUD"))
-        {
-            Color colour = obj.GetComponent<Renderer>().material.color;
-            if (visible){
-                colour.a = 1;
-            }else{
-                colour.a = 0;
-            }
-
-            obj.GetComponent<Renderer>().material.color = colour;
-        }
-    }
-
-    private void showEndText(bool visible) {
-        if (visible){
-            if (gameObject.name == "Player1") {
-                GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2\nHas Died";
-            }
-            else
-            {
-                GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 1\nHas Died";
-            }
-        } else {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "";
-        }
-        showHUD(!visible);
-    }
 }
