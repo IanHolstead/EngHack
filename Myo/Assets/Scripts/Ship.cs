@@ -139,20 +139,6 @@ public class Ship : MonoBehaviour {
 
 	void OnTriggerEnter(Collider otherObj) {
 		if (otherObj.gameObject.tag == "Dust") {
-//			collidingObjects.Add(otherObj.attachedRigidbody);
-//			Vector3 xyzDist = GetComponent<Rigidbody>().transform.position - otherObj.attachedRigidbody.transform.position;
-////			xyDist[2] = 0;
-//			print (string.Format ("xyz dist mag: {0}", xyzDist.magnitude));
-//			if (heldObject == null
-//			    && Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
-//			    //&& xyzDist.magnitude > COLLISION_RADIUS) {
-//				print ("grabbed star dust");
-//				heldObject = otherObj.attachedRigidbody;
-//			} else if (xyzDist.magnitude <= COLLISION_RADIUS){
-//				this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
-//				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
-//				Destroy (otherObj.gameObject);
-//			}
 
 			Vector3 dist = transform.position - otherObj.attachedRigidbody.transform.position;
 			float distMag = dist.magnitude;
@@ -172,6 +158,7 @@ public class Ship : MonoBehaviour {
             if (type != otherObj.GetComponent<PassWall>().type)
             {
                 life--;
+				myo.GetComponent<ThalmicMyo>().Vibrate (VibrationType.Short);
                 if (life <= 0)
                 {
                     if ((GameObject.Find("Player1").GetComponent<Ship>().Life <= 0))
