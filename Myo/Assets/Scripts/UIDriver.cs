@@ -42,6 +42,7 @@ public class UIDriver : MonoBehaviour {
             if(state != GameState.PLAYING) {
                 state = GameState.PLAYING;
                 GetComponent<Nemesis>().createLevel(difficulty);
+                updatePassWall(gameObject);
             }
 
             GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + GameObject.Find("Player1").GetComponent<Ship> ().Life.ToString();
