@@ -13,8 +13,9 @@ public class Nemesis : MonoBehaviour {
     public bool endOnFailTest = true;
     public float velocity = -0.1f;
 
-    DustTypes nextPassWallType = DustTypes.SPERE; //CHOSEN BY SPELLING MISAKE
+    DustTypes nextPassWallType = DustTypes.SPERE; //CHOSEN BY SPELLING MISTAKE
     public int wallSpawnTime = 15;
+    public float wallSpawnLocationZ = 200f;
     float timeSinceWall = 0f;
 
 	public void createLevel(){
@@ -50,7 +51,6 @@ public class Nemesis : MonoBehaviour {
                 SpawnWall();
             }
         }
-        print(passWalls.Count);
 	}
 
     void SpawnWall()

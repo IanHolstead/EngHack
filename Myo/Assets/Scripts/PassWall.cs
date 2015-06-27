@@ -19,11 +19,15 @@ public class PassWall : MonoBehaviour {
         transform.position = pos;
 	}
 
-    void OnCollisionEnter(Collision collider)
+    void OnTriggerEnter(Collider collider)
     {
         if (collider.gameObject.tag == "Player")
         {
             TestEndGame();
+        }
+        if (collider.gameObject.name == "DeathWall")
+        {
+            Destroy(gameObject);
         }
     }
 
@@ -33,6 +37,7 @@ public class PassWall : MonoBehaviour {
         bool player2Dead = false;
         foreach (Ship ship in FindObjectsOfType(typeof(Ship)))
         {
+            print(ship);
             if (ship.GetDustType() != type)
             {
                 if (ship.gameObject.name == "Player1")
@@ -62,6 +67,7 @@ public class PassWall : MonoBehaviour {
         }
         if (endGame)
         {
+            print("exit");
             Application.Quit();
         }
     }
