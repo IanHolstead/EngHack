@@ -12,6 +12,8 @@ public class Ship : MonoBehaviour {
 	private readonly float MAX_PITCH = 45.0f;
 	private readonly float MAX_VELOCITY = 3.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
+    
+    private DustTypes type = DustTypes.CUBE;
 
     public GameObject myo = null;
 	public GameObject starDustPrefab = null;
@@ -69,6 +71,13 @@ public class Ship : MonoBehaviour {
 			}
 		}
 	}
+
+    void OnCollisionEnter(Collision col) {
+        if(col.gameObject.name == "StarDust") {
+            this.type = col.gameObject.GetComponent<StarDust>().DustType;
+            this.GetComponent<MeshFilter>().mesh = col.gameObject.GetComponent<StarDust>().findMesh(type);
+        }
+    }
 
 	Vector3 calculateShipPosition() {
 
