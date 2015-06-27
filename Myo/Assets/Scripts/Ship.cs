@@ -101,17 +101,12 @@ public class Ship : MonoBehaviour {
 			switch(_lastPose) {
 			case Pose.Fist:
 				print ("fist boys");
+				throwHeldObject ();
 				holdRequestInitateTime = Time.realtimeSinceStartup;
-//				grabNearestCollidingObject();
 				break;
 			case Pose.WaveIn:
 			case Pose.WaveOut:
-				print ("shoot it out");
-				if (heldObject != null) {
-					Vector3 direction = heldObject.transform.position - transform.position;
-					heldObject.GetComponent<Rigidbody>().velocity = direction / direction.magnitude * THROW_VELOCITY;
-					heldObject = null;
-				}
+				throwHeldObject();
 				break;
 			case Pose.DoubleTap:
 				recenterShipPosition();
@@ -121,6 +116,15 @@ public class Ship : MonoBehaviour {
 			}
 		}
 
+	}
+
+
+	void throwHeldObject() {
+		if (heldObject != null) {
+			Vector3 direction = heldObject.transform.position - transform.position;
+			heldObject.GetComponent<Rigidbody>().velocity = direction / direction.magnitude * THROW_VELOCITY;
+			heldObject = null;
+		}
 	}
 
 	void updateHeldObject() {
@@ -137,7 +141,8 @@ public class Ship : MonoBehaviour {
 		
 		if (otherObj.gameObject.tag == "Dust") {
 			collidingObjects.Add(otherObj.attachedRigidbody);
-			if (Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+			if (heldObject == null && 
+			   		Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
 				print ("grabbed star dust");
 				heldObject = otherObj.attachedRigidbody;
 			} else {
