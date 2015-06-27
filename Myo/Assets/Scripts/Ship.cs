@@ -15,6 +15,7 @@ public class Ship : MonoBehaviour {
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
     
     private DustTypes type = DustTypes.CUBE;
+    private int life = 3;
 
 	private readonly float HOLD_TIME_LENIENCY = 1.0f;
 
@@ -37,6 +38,15 @@ public class Ship : MonoBehaviour {
         this.type = type;
     }
 
+    public int Life
+    {
+        get { return life; }
+        set
+        {
+            life = value;
+        }
+    }
+
     Vector3 pos = new Vector3();
     float rotation = 0f;
 	private Pose _lastPose = Pose.Rest;
@@ -47,6 +57,7 @@ public class Ship : MonoBehaviour {
     
     // Use this for initialization
     void Start () {
+        showStartText(true);
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
 		_lastPose = thalmicMyo.pose;
 	}
@@ -184,6 +195,7 @@ public class Ship : MonoBehaviour {
 
 		Vector3 eulerAngles = myo.transform.eulerAngles;
 		_myoAntiYaw = eulerAngles [1];
+        showStartText(false);
 	}
 
 	//Myo math functions
@@ -246,4 +258,56 @@ public class Ship : MonoBehaviour {
 		return angle;
 	}
 
+
+    //UI work
+    private void showStartText(bool visible) {
+        if (visible) {
+            GameObject.Find("State text").GetComponent<TextMesh>().text = "Punch The Screen\nTo Begin";
+        } else {
+            GameObject.Find("State text").GetComponent<TextMesh>().text = "";
+        }
+        showHUD(!visible);
+    }
+
+    private void showHUD(bool visible) {
+        if (visible) {
+            if (gameObject.name == "Player1") {
+                GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + life.ToString();
+            } else {
+                GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "P1 Life: " + life.ToString();
+            }
+            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "Next Gate:";
+        } else {
+            GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "";
+            GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "";
+            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "";
+        }
+
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("HUD"))
+        {
+            Color colour = obj.GetComponent<Renderer>().material.color;
+            if (visible){
+                colour.a = 1;
+            }else{
+                colour.a = 0;
+            }
+
+            obj.GetComponent<Renderer>().material.color = colour;
+        }
+    }
+
+    private void showEndText(bool visible) {
+        if (visible){
+            if (gameObject.name == "Player1") {
+                GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2\nHas Died";
+            }
+            else
+            {
+                GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 1\nHas Died";
+            }
+        } else {
+            GameObject.Find("State text").GetComponent<TextMesh>().text = "";
+        }
+        showHUD(!visible);
+    }
 }
