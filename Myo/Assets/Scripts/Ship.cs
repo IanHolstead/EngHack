@@ -20,7 +20,7 @@ public class Ship : MonoBehaviour {
     private DustTypes type = DustTypes.CUBE;
     private int life = 3;
 
-	private readonly float HOLD_TIME_LENIENCY = 3.0f;
+	private readonly float HOLD_TIME_LENIENCY = 2.0f;
 	private readonly float HOLD_DISTANCE = 1.0f;
 	private readonly float HOLD_VELOCITY_FACTOR = 0.2f;
 	private readonly float THROW_VELOCITY = 10.0f;
@@ -97,8 +97,11 @@ public class Ship : MonoBehaviour {
 			switch(_lastPose) {
 			case Pose.Fist:
 				print ("fist boys");
-				throwHeldObject ();
-				holdRequestInitateTime = Time.realtimeSinceStartup;
+				if (heldObject != null) {
+					throwHeldObject ();
+				} else {
+					holdRequestInitateTime = Time.realtimeSinceStartup;
+				}
 				break;
 			case Pose.WaveIn:
 			case Pose.WaveOut:
@@ -136,20 +139,33 @@ public class Ship : MonoBehaviour {
 
 	void OnTriggerEnter(Collider otherObj) {
 		if (otherObj.gameObject.tag == "Dust") {
-			collidingObjects.Add(otherObj.attachedRigidbody);
-			Vector3 xyzDist = GetComponent<Rigidbody>().transform.position - otherObj.attachedRigidbody.transform.position;
-//			xyDist[2] = 0;
-			print (string.Format ("xyz dist mag: {0}", xyzDist.magnitude));
-			if (heldObject == null
-			    && Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
-			    //&& xyzDist.magnitude > COLLISION_RADIUS) {
-				print ("grabbed star dust");
-				heldObject = otherObj.attachedRigidbody;
-			} else if (xyzDist.magnitude <= COLLISION_RADIUS){
+//			collidingObjects.Add(otherObj.attachedRigidbody);
+//			Vector3 xyzDist = GetComponent<Rigidbody>().transform.position - otherObj.attachedRigidbody.transform.position;
+////			xyDist[2] = 0;
+//			print (string.Format ("xyz dist mag: {0}", xyzDist.magnitude));
+//			if (heldObject == null
+//			    && Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+//			    //&& xyzDist.magnitude > COLLISION_RADIUS) {
+//				print ("grabbed star dust");
+//				heldObject = otherObj.attachedRigidbody;
+//			} else if (xyzDist.magnitude <= COLLISION_RADIUS){
+//				this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
+//				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
+//				Destroy (otherObj.gameObject);
+//			}
+
+			Vector3 dist = transform.position - otherObj.attachedRigidbody.transform.position;
+			float distMag = dist.magnitude;
+			if (distMag > COLLISION_RADIUS) {
+				if (heldObject == null && Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+					heldObject = otherObj.attachedRigidbody;
+				}
+			} else if (heldObject != otherObj.attachedRigidbody) {
 				this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
 				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
 				Destroy (otherObj.gameObject);
 			}
+
         }
         else if (otherObj.gameObject.tag == "PassWall")
         {
