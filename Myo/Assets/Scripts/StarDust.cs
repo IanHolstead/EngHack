@@ -4,32 +4,27 @@ using System.Collections;
 public class StarDust : MonoBehaviour {
 	const float DRIFSPEED = -1;
 
-
-	public enum DustType{
-		Cube = 0,
-		Sphere = 1,
-		Triangle = 2
-	}
+	
 
 	public Mesh CUBE = null,SPERE = null,TRIANGLE = null;
 
 
-	public Mesh findMesh(DustType dustType){
+	public Mesh findMesh(DustTypes dustType){
 		switch (dustType) {
-		case DustType.Cube:
+		case DustTypes.CUBE:
 			return CUBE;
-		case DustType.Sphere:
+		case DustTypes.SPERE:
 			return SPERE;
-		case DustType.Triangle:
+		case DustTypes.TRIANGLE:
 			return TRIANGLE;
 		}
 		return null;
 	}
 
 
-	private DustType dustType = DustType.Cube;
+	private DustTypes dustType = DustTypes.CUBE;
 
-	private DustType Type {
+	 public DustTypes DustType {
 		get{return dustType;}
 		set{
 			dustType = value;
