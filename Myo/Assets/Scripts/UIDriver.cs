@@ -3,15 +3,25 @@ using System.Collections.Generic;
 
 public class UIDriver : MonoBehaviour {
     private DustTypes prevPassWall = DustTypes.CUBE;
+    private int difficulty = 2;
+    private GameState state;
+
+    private enum GameState
+    {
+        START = 0,
+        PLAYING = 1,
+        END = 2
+    }
 
     // Use this for initialization
     void Start()
     {
+        state = GameState.START;
         showStartText();
         showHUD(false);
         showGateWarning(false);
 
-        GameObject.Find("Spawner").GetComponent<Nemesis>().Cleared += new Nemesis.SectionCleared(updatePassWall);
+        GetComponent<Nemesis>().Cleared += new Nemesis.SectionCleared(updatePassWall);
     }
 
     private void updatePassWall(GameObject obj)
@@ -29,6 +39,11 @@ public class UIDriver : MonoBehaviour {
     {
         if (visible)
         {
+            if(state != GameState.PLAYING) {
+                state = GameState.PLAYING;
+                GetComponent<Nemesis>().createLevel(difficulty);
+            }
+
             GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + GameObject.Find("Player1").GetComponent<Ship> ().Life.ToString();
             GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "P2 Life: " + GameObject.Find("Player2").GetComponent<Ship>().Life.ToString();
             GameObject.Find("Gate text").GetComponent<TextMesh>().text = "Next Gate:";
@@ -95,10 +110,11 @@ public class UIDriver : MonoBehaviour {
 
     public void showEndText(bool p1Death)
     {
+        state = GameState.END;
         if (p1Death) {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2 Has Died\nPunch The Screen\nTo Play Again";
-        } else {
             GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 1 Has Died\nPunch The Screen\nTo Play Again";
+        } else {
+            GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2 Has Died\nPunch The Screen\nTo Play Again";
         }
     }
 

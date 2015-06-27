@@ -191,7 +191,6 @@ public class Nemesis : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		loadPlans ();
-		createLevel (3);
 	}
 
 	void SpawnWall(DustTypes passWallType, float zset)
