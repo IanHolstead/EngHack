@@ -27,7 +27,7 @@ public class Nemesis : MonoBehaviour {
     public GameObject passWall;
 
     public bool endOnFailTest = true;
-    public Vector3 velocity = new Vector3 (0, 0, -5);
+    public Vector3 velocity;
 
 
 
@@ -67,8 +67,7 @@ public class Nemesis : MonoBehaviour {
 
 
 		zset += 20;
-		
-		print (zset);
+
 		SpawnWall (pass, zset);
 
 		zset += 30;
