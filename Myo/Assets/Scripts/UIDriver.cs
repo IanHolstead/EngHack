@@ -6,11 +6,20 @@ public class UIDriver : MonoBehaviour {
     private int difficulty = 2;
     private GameState state;
 
-    private enum GameState
+    public enum GameState
     {
         START = 0,
         PLAYING = 1,
         END = 2
+    }
+
+    public GameState State
+    {
+        get { return state; }
+        set
+        {
+            state = value;
+        }
     }
 
     // Use this for initialization
@@ -26,8 +35,15 @@ public class UIDriver : MonoBehaviour {
 
     private void updatePassWall(GameObject obj)
     {
-        prevPassWall = obj.GetComponent<Nemesis> ().passWalls[0].GetComponent<PassWall> ().type;
-        showGateWarning(true);
+        if (obj.GetComponent<Nemesis>().passWalls.Count > 0)
+        {
+            prevPassWall = obj.GetComponent<Nemesis>().passWalls[0].GetComponent<PassWall>().type;
+            showGateWarning(true);
+        }
+        else
+        {
+            showGateWarning(false);
+        }
     }
 
     public void showStartText()
@@ -42,6 +58,7 @@ public class UIDriver : MonoBehaviour {
             if(state != GameState.PLAYING) {
                 state = GameState.PLAYING;
                 GetComponent<Nemesis>().createLevel(difficulty);
+                updatePassWall(gameObject);
             }
 
             GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + GameObject.Find("Player1").GetComponent<Ship> ().Life.ToString();
