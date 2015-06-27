@@ -15,9 +15,12 @@ public class PassWall : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         Vector3 pos = transform.position;
-        pos.z += velocity;
+		pos.z += velocity * Time.deltaTime;;
         transform.position = pos;
 	}
+
+	public delegate void WallRemoved(GameObject sender);
+	public event WallRemoved Removed;
 
     void OnTriggerEnter(Collider collider)
     {
@@ -27,6 +30,10 @@ public class PassWall : MonoBehaviour {
         }
         if (collider.gameObject.name == "DeathWall")
         {
+			if (Removed != null)
+				Removed(this.gameObject);
+
+
             Destroy(gameObject);
         }
     }
