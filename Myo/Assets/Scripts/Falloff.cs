@@ -22,6 +22,10 @@ public class Falloff : MonoBehaviour {
 	void Update () {
         Color colour = GetComponent<MeshRenderer>().material.color;
         colour.a = getTransperency();
+        if (gameObject.tag == "PassWall")
+        {
+            colour.a = colour.a * .4f;
+        }
         GetComponent<MeshRenderer>().material.color = colour;
     }
 
