@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class StarDust : MonoBehaviour {
-	const double DRIFSPEED = -1;
+	const float DRIFSPEED = -1;
 
 
 	public enum DustType{
@@ -11,33 +11,53 @@ public class StarDust : MonoBehaviour {
 		Triangle = 2
 	}
 
-	private DustType type;
+	public Mesh CUBE = null,SPERE = null,TRIANGLE = null;
+
+
+	public Mesh findMesh(DustType dustType){
+		switch (dustType) {
+		case DustType.Cube:
+			return CUBE;
+		case DustType.Sphere:
+			return SPERE;
+		case DustType.Triangle:
+			return TRIANGLE;
+		}
+		return null;
+	}
+
+
+	private DustType dustType = DustType.Cube;
 
 	private DustType Type {
-		get{return type;}
+		get{return dustType;}
 		set{
-			type = value;
-			MeshRenderer render = pos.GetChild (this.type).GetComponents<MeshRenderer> ();
-			render.enabled = true;
+			dustType = value;
+			this.GetComponent<MeshFilter>().mesh = findMesh(dustType);
+			this.GetComponent<MeshRenderer>().enabled = true;
+			
 		}
 	}
 
-	public double speed = 0;
-
-	private Transform pos = GetComponent<Transform>();
+	public float speed = 0;
 	
+	
+
 	public void startDrift(){
 		speed = DRIFSPEED;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		pos.forward += speed;
+		Vector3 pos = this.transform.position;
+		pos.z += speed;
+		this.transform.position = pos;
 	}
 
-	void OnCollisionEnter(otherObj: Collision) {
-		if (otherObj.tag == "Arrow") {
-			ApplyDamage(10);
+	void OnCollisionEnter(Collision otherObj) {
+
+		if (otherObj.gameObject.name == "DeathWall") {
+			Destroy(this.gameObject);
 		}
 	}
 }

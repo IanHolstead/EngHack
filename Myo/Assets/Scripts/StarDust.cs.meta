@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 5be0134adfa939c459696f05b60799af
-timeCreated: 1435369980
+timeCreated: 1435376315
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - CUBE: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  - SPERE: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  - TRIANGLE: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
