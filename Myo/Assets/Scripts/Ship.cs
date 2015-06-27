@@ -17,14 +17,14 @@ public class Ship : MonoBehaviour {
     private DustTypes type = DustTypes.CUBE;
     private int life = 3;
 
-	private readonly float HOLD_TIME_LENIENCY = 1.0f;
+	private readonly float HOLD_TIME_LENIENCY = 2.0f;
 
     public GameObject myo = null;
 	public GameObject opposingShip = null;
 	public GameObject starDustPrefab = null;
 
     private List<Rigidbody> collidingObjects = new List<Rigidbody>();
-	private StarDust heldStarDust = null;
+	private StarDust heldObject = null;
 	private float holdRequestInitateTime;
 	private float holdStartTime;
 	private bool holdRequestIsActive;
@@ -92,18 +92,10 @@ public class Ship : MonoBehaviour {
 				grabNearestCollidingObject();
 				break;
 			case Pose.WaveIn:
-				print ("wave in boys");
-				dust = (GameObject)Instantiate(starDustPrefab, new Vector3(transform.position.x, transform.position.y, 0), transform.rotation);
-				dust.GetComponent<StarDust>().DustType = DustTypes.SPERE;
-//				dust = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-//				dust.transform.position = transform.position;
-//				dust.transform.rotation = transform.rotation;
-//				Vector3 throwDir = new Vector3(-Mathf.Cos(roll*Mathf.PI/180), -Mathf.Sin (roll*Mathf.PI/180), 0);
-//				float throwVelocity = 50.0f;
-//				dust.AddComponent<Rigidbody>().AddForce(throwDir * throwVelocity, ForceMode.VelocityChange);
-				break;
 			case Pose.WaveOut:
-				print ("wave out boys");
+				print ("shoot it out");
+
+
 				dust = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 				dust.transform.position = new Vector3(transform.position.x, transform.position.y, 2);
 				dust.transform.rotation = transform.rotation;
@@ -143,26 +135,24 @@ public class Ship : MonoBehaviour {
 	// events
 
 	void OnTriggerEnter(Collider otherObj) {
-		print (string.Format ("{0} enters", otherObj.name));
-//		if (otherObj.tag == "StarDust") {
-			collidingObjects.Add(otherObj.attachedRigidbody);
-//		}
-		if (Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
-			print ("grabbed star dust");
-			heldStarDust = null;
-		}
-
+		
 		if (otherObj.gameObject.tag == "Dust") {
-			this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
-			this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
+			collidingObjects.Add(otherObj.attachedRigidbody);
+			if (Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+				print ("grabbed star dust");
+				heldObject = null;
+			} else {
+				this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
+				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
+			}
 		}
 	}
 
 	void OnTriggerExit(Collider otherObj) {
 		print (string.Format ("{0} exits", otherObj.name));
-//		if (otherObj.tag == "StarDust") {
-		collidingObjects.Remove (otherObj.attachedRigidbody);
-//		}
+		if (otherObj.gameObject.tag == "Dust") {
+			collidingObjects.Remove (otherObj.attachedRigidbody);
+		}
 	}
 
 	Vector3 calculateShipPosition() {
