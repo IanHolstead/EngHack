@@ -4,14 +4,16 @@ using System.Collections;
 public class Falloff : MonoBehaviour {
 
     GameObject PlayerCamera;
-    public float invisibleDistance = 200f;
-    public float visibleDistance = 100f;
+    public float invisibleUntilDistance = 200f;
+    public float visibleStartDistance = 100f;
+    public float visibleUntilDistance = 0f;
+    public float invisibleStartDistance = -10f;
 
 	// Use this for initialization
 	void Start () {
-        if (visibleDistance < invisibleDistance)
+        if (visibleStartDistance > invisibleUntilDistance)
         {
-            invisibleDistance = visibleDistance + 100;
+            invisibleUntilDistance = visibleStartDistance + 100;
         }
         PlayerCamera = GameObject.FindGameObjectWithTag("MainCamera");
 	}
@@ -26,13 +28,21 @@ public class Falloff : MonoBehaviour {
     private float getTransperency ()
     {
         float distanceToCamera = Mathf.Abs(PlayerCamera.transform.position.z - transform.position.z);
-        if (distanceToCamera <= 100f)
+        if (distanceToCamera <= invisibleStartDistance)
+        {
+            return 0f;
+        }
+        else if (distanceToCamera <= visibleUntilDistance)
+        {
+            return (distanceToCamera - invisibleStartDistance) / (visibleUntilDistance - invisibleStartDistance);
+        }
+        else if (distanceToCamera <= visibleStartDistance)
         {
             return 1f;
         }
-        else if(distanceToCamera <= 200)
+        else if(distanceToCamera <= invisibleUntilDistance)
         {
-            return 1f - ((distanceToCamera - visibleDistance) / 100);
+            return 1f - ((distanceToCamera - visibleStartDistance) / (invisibleUntilDistance - visibleStartDistance));
         }
         return 0f;
     }
