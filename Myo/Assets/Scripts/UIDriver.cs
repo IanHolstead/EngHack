@@ -3,8 +3,9 @@ using System.Collections.Generic;
 
 public class UIDriver : MonoBehaviour {
     private DustTypes prevPassWall = DustTypes.CUBE;
-    private int difficulty = 2;
+    private int difficulty = 1;
     private GameState state;
+    private bool endGame = true;
 
     public enum GameState
     {
@@ -26,11 +27,13 @@ public class UIDriver : MonoBehaviour {
     void Start()
     {
         state = GameState.START;
-        showStartText();
+        showStateText("Punch The Screen\nTo Begin");
         showHUD(false);
         showGateWarning(false);
 
         GetComponent<Nemesis>().Cleared += new Nemesis.SectionCleared(updatePassWall);
+        GetComponent<Nemesis>().Finnished += new Nemesis.LevelFinnished(startLevel);
+        //GetComponent<PassWall>().Removed += new PassWall.WallRemoved(updatePassWall);
     }
 
     private void updatePassWall(GameObject obj)
@@ -46,27 +49,51 @@ public class UIDriver : MonoBehaviour {
         }
     }
 
-    public void showStartText()
+    private void startLevel(GameObject obj)
     {
-        GameObject.Find("State text").GetComponent<TextMesh>().text = "Punch The Screen\nTo Begin";
+        gameObject.GetComponent<Nemesis>().removeAll();
+        state = GameState.PLAYING;
+        GetComponent<Nemesis>().createLevel(difficulty);
+        updatePassWall(gameObject);
+        difficulty++;
+    }
+
+    private void resetLevel()
+    {
+        state = GameState.END;
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            player.GetComponent<Ship>().Life = 3;
+        }
+
+        difficulty = 1;
+
+        //TODO: set this to 0       gameObject.GetComponent<Nemesis>().velocity = 
+    }
+
+    public void showStateText(string text)
+    {
+        GameObject.Find("State text").GetComponent<TextMesh>().text = text;
     }
 
     public void showHUD(bool visible)
     {
         if (visible)
         {
-            if(state != GameState.PLAYING) {
-                state = GameState.PLAYING;
-                GetComponent<Nemesis>().createLevel(difficulty);
-                updatePassWall(gameObject);
+            if (state != GameState.PLAYING)
+            {
+                startLevel(gameObject);
             }
-
             GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + GameObject.Find("Player1").GetComponent<Ship> ().Life.ToString();
             GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "P2 Life: " + GameObject.Find("Player2").GetComponent<Ship>().Life.ToString();
             GameObject.Find("Gate text").GetComponent<TextMesh>().text = "Next Gate:";
         }
         else
         {
+            if (state == GameState.PLAYING)
+            {
+                resetLevel();
+            }
             GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "";
             GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "";
             GameObject.Find("Gate text").GetComponent<TextMesh>().text = "";
@@ -125,18 +152,18 @@ public class UIDriver : MonoBehaviour {
         }
     }
 
-    public void showEndText(bool p1Death)
-    {
-        state = GameState.END;
-        if (p1Death) {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 1 Has Died\nPunch The Screen\nTo Play Again";
-        } else {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2 Has Died\nPunch The Screen\nTo Play Again";
-        }
-    }
+   // public void showEndText(bool p1Death)
+    //{
+        //state = GameState.END;
+       // if (p1Death) {
+        //    GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 1 Has Died\nPunch The Screen\nTo Play Again";
+        //} else {
+       //     GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2 Has Died\nPunch The Screen\nTo Play Again";
+       // }
+    //}
 
-    public void clearStateText()
+    public void setup(bool lethal)
     {
-        GameObject.Find("State text").GetComponent<TextMesh>().text = "";
+        endGame = lethal;
     }
 }

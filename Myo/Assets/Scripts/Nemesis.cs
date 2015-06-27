@@ -20,7 +20,7 @@ public class Nemesis : MonoBehaviour {
 	public event SectionCleared Cleared;
 
 	public delegate void LevelFinnished(GameObject sender);
-	public event SectionCleared Finnished;
+	public event LevelFinnished Finnished;
 
 	public List<GameObject> dust = new List<GameObject>();
 	public List<GameObject> passWalls = new List<GameObject>();
@@ -29,7 +29,6 @@ public class Nemesis : MonoBehaviour {
 	public GameObject startDust = null;
     public GameObject passWall;
 
-    public bool endOnFailTest = true;
     public Vector3 velocity;
 
 
@@ -224,7 +223,7 @@ public class Nemesis : MonoBehaviour {
 		GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, zset), Quaternion.AngleAxis(-90, new Vector3(1,0,0)));
 		passWalls.Add (passWallInstance);
 		PassWall script = passWallInstance.GetComponent<PassWall> ();
-		script.Setup(passWallType, endOnFailTest, velocity.z);
+		script.Setup(passWallType, velocity.z);
 		script.Removed += new PassWall.WallRemoved (wallRemoved);
 
     }
