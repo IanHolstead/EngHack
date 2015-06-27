@@ -57,7 +57,6 @@ public class Ship : MonoBehaviour {
     
     // Use this for initialization
     void Start () {
-        showStartText(true);
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
 		_lastPose = thalmicMyo.pose;
 	}
@@ -195,7 +194,8 @@ public class Ship : MonoBehaviour {
 
 		Vector3 eulerAngles = myo.transform.eulerAngles;
 		_myoAntiYaw = eulerAngles [1];
-        showStartText(false);
+        GameObject.Find("Spawner").GetComponent<UIDriver> ().clearStateText();
+        GameObject.Find("Spawner").GetComponent<UIDriver> ().showHUD(true);
 	}
 
 	//Myo math functions
@@ -257,57 +257,4 @@ public class Ship : MonoBehaviour {
 		}
 		return angle;
 	}
-
-
-    //UI work
-    private void showStartText(bool visible) {
-        if (visible) {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "Punch The Screen\nTo Begin";
-        } else {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "";
-        }
-        showHUD(!visible);
-    }
-
-    private void showHUD(bool visible) {
-        if (visible) {
-            if (gameObject.name == "Player1") {
-                GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "P1 Life: " + life.ToString();
-            } else {
-                GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "P1 Life: " + life.ToString();
-            }
-            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "Next Gate:";
-        } else {
-            GameObject.Find("Player 1 life text").GetComponent<TextMesh>().text = "";
-            GameObject.Find("Player 2 life text").GetComponent<TextMesh>().text = "";
-            GameObject.Find("Gate text").GetComponent<TextMesh>().text = "";
-        }
-
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag("HUD"))
-        {
-            Color colour = obj.GetComponent<Renderer>().material.color;
-            if (visible){
-                colour.a = 1;
-            }else{
-                colour.a = 0;
-            }
-
-            obj.GetComponent<Renderer>().material.color = colour;
-        }
-    }
-
-    private void showEndText(bool visible) {
-        if (visible){
-            if (gameObject.name == "Player1") {
-                GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2\nHas Died";
-            }
-            else
-            {
-                GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 1\nHas Died";
-            }
-        } else {
-            GameObject.Find("State text").GetComponent<TextMesh>().text = "";
-        }
-        showHUD(!visible);
-    }
 }
