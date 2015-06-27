@@ -8,14 +8,13 @@ using VibrationType = Thalmic.Myo.VibrationType;
 
 public class Ship : MonoBehaviour {
 
-	private const float MAX_YAW = Mathf.PI/4;
-	private const float MAX_PITCH = Mathf.PI/4;
+	private const float MAX_YAW = 45.0f;
+	private const float MAX_PITCH = 45.0f;
+	private const float MAX_VELOCITY = 3.0f;
 
     public GameObject myo = null;
 
     public Vector3 maxPos = new Vector3(10f, 5.5f, 0f);
-
-    public float maxVelocity = 80f;
 
     Vector3 pos = new Vector3();
     float rotation = 0f;
@@ -37,31 +36,44 @@ public class Ship : MonoBehaviour {
 			recenterShipPosition();
 		}
 
-		pos = calculateShipPosition ();
+		Vector3 targetPos = calculateShipPosition ();
+		float dist = Vector3.Distance (pos, targetPos);
+		if (dist > MAX_VELOCITY * Time.deltaTime) {
+			pos = Vector3.Lerp (pos, targetPos, MAX_VELOCITY / dist);
+		} else {
+			pos = targetPos;
+		}
 		transform.position = pos;
 	}
 
 	Vector3 calculateShipPosition() {
-		// Current zero roll vector and roll value.
-//		Vector3 zeroRoll = computeZeroRollVector (myo.transform.forward);
-//		float absoluteRoll = rollFromZero (zeroRoll, myo.transform.forward, myo.transform.up);
-//		float roll = normalizeAngle (absoluteRoll - _myoReferenceRoll);
 
+		//Euler angles are given in PYR (??)
 		Vector3 eulerAngles = myo.transform.eulerAngles;
-		print (eulerAngles);
-		float pitch = eulerAngles[1];
-		float yaw = eulerAngles[2] - _myoAntiYaw;
+		float pitch = normalizeAngle(eulerAngles[0]);
+		float yaw = normalizeAngle(eulerAngles[1] - _myoAntiYaw);
 
 		float x = maxPos [0] * yaw / MAX_YAW;
-		float y = maxPos [1] * pitch / MAX_PITCH;
-		//print(string.Format("x and y: {0}, {1} (p={2}, y={3})", x, y, pitch, yaw));
+		if (x > maxPos [0]) {
+			x = maxPos [0];
+		} else if (x < -maxPos [0]) {
+			x = -maxPos [0];
+		}
+		
+		float y = -maxPos [1] * pitch / MAX_PITCH;
+		if (y > maxPos [1]) {
+			y = maxPos [1];
+		} else if (y < -maxPos [1]) {
+			y = -maxPos [1];
+		}
+		print(string.Format("x and y: {0}, {1} (p={2}, y={3})", x, y, pitch, yaw));
 		return new Vector3 (x, y, 0.0f);
 	}
 
 	void recenterShipPosition() {
 		Vector3 eulerAngles = myo.transform.eulerAngles;
-		_myoReferenceRoll = eulerAngles [0];
-		_myoAntiYaw = eulerAngles [2];
+		_myoReferenceRoll = eulerAngles [2];
+		_myoAntiYaw = eulerAngles [1];
 	}
 
 	//Myo math functions
