@@ -18,7 +18,7 @@ public class Ship : MonoBehaviour {
     public GameObject myo = null;
 	public GameObject starDustPrefab = null;
 
-    public DustTypes getType() {
+    public DustTypes GetDustType() {
         return type;
     }
 

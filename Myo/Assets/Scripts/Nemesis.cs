@@ -13,7 +13,7 @@ public class Nemesis : MonoBehaviour {
     public bool endOnFailTest = true;
     public float velocity = -0.1f;
 
-    DustTypes nextPassWallType;
+    DustTypes nextPassWallType = DustTypes.SPERE; //CHOSEN BY SPELLING MISAKE
     public int wallSpawnTime = 15;
     float timeSinceWall = 0f;
 
@@ -47,15 +47,16 @@ public class Nemesis : MonoBehaviour {
             timeSinceWall += Time.deltaTime;
             if (timeSinceWall > wallSpawnTime)
             {
-                
+                SpawnWall();
             }
         }
-        
+        print(passWalls.Count);
 	}
 
     void SpawnWall()
     {
-        GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, 200), transform.rotation);
+        GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, 200), Quaternion.AngleAxis(-90, new Vector3(1, 0, 0)));
         passWallInstance.GetComponent<PassWall>().Setup(nextPassWallType, endOnFailTest, velocity);
+        passWalls.AddLast(passWallInstance);
     }
 }
