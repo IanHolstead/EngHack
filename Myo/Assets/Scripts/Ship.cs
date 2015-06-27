@@ -14,11 +14,13 @@ public class Ship : MonoBehaviour {
 	private readonly float MAX_VELOCITY = 80.0f;
 	private readonly float MAX_ACCEL = 400.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
+
+	private readonly float COLLISION_RADIUS = 1.1f;
     
     private DustTypes type = DustTypes.CUBE;
     private int life = 3;
 
-	private readonly float HOLD_TIME_LENIENCY = 2.0f;
+	private readonly float HOLD_TIME_LENIENCY = 3.0f;
 	private readonly float HOLD_DISTANCE = 1.0f;
 	private readonly float HOLD_VELOCITY_FACTOR = 0.2f;
 	private readonly float THROW_VELOCITY = 10.0f;
@@ -71,15 +73,6 @@ public class Ship : MonoBehaviour {
 		}
 
 		Vector3 targetPos = calculateShipPosition ();
-//		Vector3 accelTick = targetPos - transform.position;
-//		if (accelTick.magnitude > MAX_ACCEL * Time.deltaTime) {
-//			accelTick = accelTick * accelTick.magnitude / (MAX_ACCEL * Time.deltaTime);
-//		}
-//		GetComponent<Rigidbody> ().AddForce (accelTick, ForceMode.VelocityChange);
-//		Vector3 finalVelocity = GetComponent<Rigidbody> ().velocity;
-//		if (finalVelocity.sqrMagnitude > MAX_VELOCITY * MAX_VELOCITY) {
-//			finalVelocity = finalVelocity / finalVelocity.magnitude * MAX_VELOCITY;
-//		}
 		Vector3 dist = targetPos - transform.position;
 		Vector3 finalVelocity;
 		float velocityFactor = (heldObject == null)? 1.0f : HOLD_VELOCITY_FACTOR;
@@ -90,6 +83,9 @@ public class Ship : MonoBehaviour {
 		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
 
 		updateHeldObject ();
+		holdRequestIsActive = (Time.realtimeSinceStartup - holdRequestInitateTime) < HOLD_TIME_LENIENCY;
+		Behaviour halo = (Behaviour)GetComponent ("Halo");
+		halo.enabled = holdRequestIsActive;
 		
 
 		//check for pose changes
@@ -122,6 +118,7 @@ public class Ship : MonoBehaviour {
 	void throwHeldObject() {
 		if (heldObject != null) {
 			Vector3 direction = heldObject.transform.position - transform.position;
+			direction[2] = 0;
 			heldObject.GetComponent<Rigidbody>().velocity = direction / direction.magnitude * THROW_VELOCITY;
 			heldObject = null;
 		}
@@ -140,11 +137,15 @@ public class Ship : MonoBehaviour {
 	void OnTriggerEnter(Collider otherObj) {
 		if (otherObj.gameObject.tag == "Dust") {
 			collidingObjects.Add(otherObj.attachedRigidbody);
-			if (heldObject == null && 
-			   		Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+			Vector3 xyzDist = GetComponent<Rigidbody>().transform.position - otherObj.attachedRigidbody.transform.position;
+//			xyDist[2] = 0;
+			print (string.Format ("xyz dist mag: {0}", xyzDist.magnitude));
+			if (heldObject == null
+			    && Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+			    //&& xyzDist.magnitude > COLLISION_RADIUS) {
 				print ("grabbed star dust");
 				heldObject = otherObj.attachedRigidbody;
-			} else {
+			} else if (xyzDist.magnitude <= COLLISION_RADIUS){
 				this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
 				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
 				Destroy (otherObj.gameObject);
@@ -211,8 +212,12 @@ public class Ship : MonoBehaviour {
 
 		Vector3 eulerAngles = myo.transform.eulerAngles;
 		_myoAntiYaw = eulerAngles [1];
-        GameObject.Find("Spawner").GetComponent<UIDriver> ().clearStateText();
-        GameObject.Find("Spawner").GetComponent<UIDriver> ().showHUD(true);
+        if (GameObject.Find("Spawner").GetComponent<UIDriver>().State != UIDriver.GameState.PLAYING)
+        {
+            life = 3;
+            GameObject.Find("Spawner").GetComponent<UIDriver>().clearStateText();
+            GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(true);
+        }
 	}
 
 	//Myo math functions
