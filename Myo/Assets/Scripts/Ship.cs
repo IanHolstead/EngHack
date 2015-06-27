@@ -72,10 +72,10 @@ public class Ship : MonoBehaviour {
 		}
 	}
 
-    void OnCollisionEnter(Collision col) {
-        if(col.gameObject.name == "StarDust") {
-            this.type = col.gameObject.GetComponent<StarDust>().DustType;
-            this.GetComponent<MeshFilter>().mesh = col.gameObject.GetComponent<StarDust>().findMesh(type);
+    void OnTriggerEnter(Collider otherObj) {
+        if (otherObj.gameObject.name == "StarDust") {
+            this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
+            this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
         }
     }
 

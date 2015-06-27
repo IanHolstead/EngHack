@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class StarDust : MonoBehaviour {
-	const float DRIFSPEED = -0.3f;
+	Vector3 DRIFVEL = new Vector3(0, 0, -0.1f);
 
 	
 
@@ -34,26 +34,22 @@ public class StarDust : MonoBehaviour {
 		}
 	}
 
-	public float speed = 0;
+	public Vector3 vel = new Vector3();
 	
 	
 
 	public void startDrift(){
-		speed = DRIFSPEED;
+		vel = DRIFVEL;
 	}
 
 	// Update is called once per frame
 	void Update () {
-		Vector3 pos = this.transform.position;
-		pos.z += speed;
-		this.transform.position = pos;
+		this.transform.position = this.transform.position + vel;
 	}
 
-	void OnCollisionEnter(Collision otherObj) {
-		Debug.Log ("co");
+	void OnTriggerEnter(Collider otherObj) {
 
 		if (otherObj.gameObject.name == "DeathWall") {
-			Debug.Log ("death");
 			Destroy(this.gameObject);
 		}
 	}
