@@ -54,7 +54,7 @@ public class Nemesis : MonoBehaviour {
 
 		zset += 20;
 		
-
+		print (zset);
 		SpawnWall (pass, zset);
 
 		zset += 30;
@@ -170,7 +170,6 @@ public class Nemesis : MonoBehaviour {
 		script.DustType = type;
 		script.Velocity = velocity;
 		script.spin ();
-		Debug.Log ("spawn");
 
 	}
 
