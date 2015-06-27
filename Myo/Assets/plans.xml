@@ -1,0 +1,12 @@
+<plans>
+<plan dif="-2">
+	<dust type = "key">0,0,0</dust>
+	<dust>5,0,0</dust>
+	<dust>-5,0,0</dust>
+</plan>
+<plan dif="1">
+	<dust type = "key">0,0,0</dust>
+	<dust>0,2,0</dust>
+	<dust>0,-2,0</dust>
+</plan>
+</plans>
