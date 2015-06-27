@@ -37,13 +37,11 @@ public class Ship : MonoBehaviour {
 		}
 
 		Vector3 targetPos = calculateShipPosition ();
-		float dist = Vector3.Distance (pos, targetPos);
-		if (dist > MAX_VELOCITY * Time.deltaTime) {
-			pos = Vector3.Lerp (pos, targetPos, MAX_VELOCITY / dist);
-		} else {
-			pos = targetPos;
+		Vector3 velocity = targetPos - transform.position;
+		if (velocity.magnitude > MAX_VELOCITY) {
+			velocity = velocity * velocity.magnitude / MAX_VELOCITY;
 		}
-		transform.position = pos;
+		GetComponent<Rigidbody> ().AddForce (velocity, ForceMode.VelocityChange);
 
 
 		float roll = calculateShipRoll ();
