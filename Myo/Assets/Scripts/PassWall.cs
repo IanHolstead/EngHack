@@ -5,7 +5,6 @@ public class PassWall : MonoBehaviour {
 
     public float velocity = 0.1f;
     public DustTypes type;
-    bool endGame = true;
 	
     // Use this for initialization
 	void Start () {
@@ -24,10 +23,6 @@ public class PassWall : MonoBehaviour {
 
     void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject.tag == "Player")
-        {
-            TestEndGame();
-        }
         if (collider.gameObject.name == "DeathWall")
         {
 			if (Removed != null)
@@ -38,51 +33,9 @@ public class PassWall : MonoBehaviour {
         }
     }
 
-    void TestEndGame()
-    {
-        bool player1Dead = false;
-        bool player2Dead = false;
-        foreach (Ship ship in FindObjectsOfType(typeof(Ship)))
-        {
-            print(ship);
-            if (ship.GetDustType() != type)
-            {
-                if (ship.gameObject.name == "Player1")
-                {
-                    player1Dead = true;
-                }
-                else
-                {
-                    player2Dead = true;
-                }
-            }
-        }
-        if (player1Dead)
-        {
-            if (player2Dead)
-            {
-                print("You Both Died! How could you!?!");
-            }
-            else
-            {
-                print("Player 2 Wins!");
-            }
-        }
-        else
-        {
-            print("Player 1 Wins!");
-        }
-        if (endGame)
-        {
-            print("exit");
-            Application.Quit();
-        }
-    }
-
-    public void Setup(DustTypes dustType, bool leathal, float velocity)
+    public void Setup(DustTypes dustType, float velocity)
     {
         type = dustType;
-        endGame = leathal;
         this.velocity = velocity;
     }
 }

@@ -19,6 +19,7 @@ public class Ship : MonoBehaviour {
     
     private DustTypes type = DustTypes.CUBE;
     private int life = 3;
+    private bool lockLife = false;
 
 	private readonly float HOLD_TIME_LENIENCY = 2.0f;
 	private readonly float HOLD_DISTANCE = 1.0f;
@@ -155,19 +156,34 @@ public class Ship : MonoBehaviour {
         }
         else if (otherObj.gameObject.tag == "PassWall")
         {
-            if (type != otherObj.GetComponent<PassWall>().type)
+            if (type != otherObj.GetComponent<PassWall>().type && !lockLife)
             {
+                lockLife = true;
                 life--;
 				myo.GetComponent<ThalmicMyo>().Vibrate (VibrationType.Short);
                 if (life <= 0)
                 {
                     if ((GameObject.Find("Player1").GetComponent<Ship>().Life <= 0))
                     {
-                        GameObject.Find("Spawner").GetComponent<UIDriver>().showEndText(true);
+                        if (opposingShip.GetComponent<Ship>().Life <= 0)
+                        {
+                            GameObject.Find("Spawner").GetComponent<UIDriver>().showStateText("Just... Wow.\nPunch The Screen\nTo Play Again");
+                        }
+                        else
+                        {
+                            GameObject.Find("Spawner").GetComponent<UIDriver>().showStateText("Player 1 Has Died\nPunch The Screen\nTo Play Again");
+                        }
                     }
                     else
                     {
-                        GameObject.Find("Spawner").GetComponent<UIDriver>().showEndText(false);
+                        if (opposingShip.GetComponent<Ship>().Life <= 0)
+                        {
+                            GameObject.Find("Spawner").GetComponent<UIDriver>().showStateText("Both Of You Suck.\nPunch The Screen\nTo Play Again");
+                        }
+                        else
+                        {
+                            GameObject.Find("Spawner").GetComponent<UIDriver>().showStateText("Player 2 Has Died\nPunch The Screen\nTo Play Again");
+                        }
                     }
                     GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(false);
                 }
@@ -180,6 +196,7 @@ public class Ship : MonoBehaviour {
 	}
 
 	void OnTriggerExit(Collider otherObj) {
+        lockLife = false;
 		if (otherObj.gameObject.tag == "Dust") {
 			collidingObjects.Remove (otherObj.attachedRigidbody);
 		}
@@ -217,8 +234,7 @@ public class Ship : MonoBehaviour {
 		_myoAntiYaw = eulerAngles [1];
         if (GameObject.Find("Spawner").GetComponent<UIDriver>().State != UIDriver.GameState.PLAYING)
         {
-            life = 3;
-            GameObject.Find("Spawner").GetComponent<UIDriver>().clearStateText();
+            GameObject.Find("Spawner").GetComponent<UIDriver>().showStateText("");
             GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(true);
         }
 	}
