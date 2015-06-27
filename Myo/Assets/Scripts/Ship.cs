@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections; 
+using System.Collections.Generic;
 
 using LockingPolicy = Thalmic.Myo.LockingPolicy;
 using Pose = Thalmic.Myo.Pose;
@@ -15,8 +16,26 @@ public class Ship : MonoBehaviour {
     
     private DustTypes type = DustTypes.CUBE;
 
+	private readonly float HOLD_TIME_LENIENCY = 1.0f;
+
     public GameObject myo = null;
+	public GameObject opposingShip = null;
 	public GameObject starDustPrefab = null;
+
+	private List<Rigidbody> collidingObjects = new List<Rigidbody>();
+	private StarDust heldStarDust = null;
+	private float holdRequestInitateTime;
+	private float holdStartTime;
+	private bool holdRequestIsActive;
+
+
+    public DustTypes getType() {
+        return type;
+    }
+
+    public void setType(DustTypes type) {
+        this.type = type;
+    }
 
     Vector3 pos = new Vector3();
     float rotation = 0f;
@@ -31,7 +50,7 @@ public class Ship : MonoBehaviour {
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
 		_lastPose = thalmicMyo.pose;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown ("r")) {
@@ -51,20 +70,40 @@ public class Ship : MonoBehaviour {
 
 		//check for pose changes
 		ThalmicMyo thalmicMyo = myo.GetComponent<ThalmicMyo> ();
-//		StarDust dust;
-		if (_lastPose != thalmicMyo.pose) {
+		if (thalmicMyo != null && _lastPose != thalmicMyo.pose) {
 			_lastPose = thalmicMyo.pose;
+
+			GameObject dust;
 			switch(_lastPose) {
 			case Pose.Fist:
 				print ("fist boys");
+				holdRequestInitateTime = Time.realtimeSinceStartup;
+				grabNearestCollidingObject();
 				break;
 			case Pose.WaveIn:
 				print ("wave in boys");
-//				dust = (StarDust) Instantiate(starDustPrefab, transform.position, transform.rotation);
+				dust = (GameObject)Instantiate(starDustPrefab, new Vector3(transform.position.x, transform.position.y, 0), transform.rotation);
+				dust.GetComponent<StarDust>().DustType = DustTypes.SPERE;
+//				dust = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+//				dust.transform.position = transform.position;
+//				dust.transform.rotation = transform.rotation;
+//				Vector3 throwDir = new Vector3(-Mathf.Cos(roll*Mathf.PI/180), -Mathf.Sin (roll*Mathf.PI/180), 0);
+//				float throwVelocity = 50.0f;
+//				dust.AddComponent<Rigidbody>().AddForce(throwDir * throwVelocity, ForceMode.VelocityChange);
 				break;
 			case Pose.WaveOut:
 				print ("wave out boys");
-//				dust = (StarDust) Instantiate(starDustPrefab, transform.position, transform.rotation);
+				dust = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				dust.transform.position = new Vector3(transform.position.x, transform.position.y, 2);
+				dust.transform.rotation = transform.rotation;
+//				Vector3 throwDir = new Vector3(Mathf.Cos(roll*Mathf.PI/180), Mathf.Sin (roll*Mathf.PI/180), 0);
+//				float throwVelocity = 50.0f;
+				Vector3 throwDir = opposingShip.transform.position - transform.position;
+				float throwVelocity = 5.0f;
+				dust.AddComponent<Rigidbody>().AddForce(throwDir * throwVelocity, ForceMode.VelocityChange);
+				break;
+			case Pose.DoubleTap:
+				recenterShipPosition();
 				break;
 			default:
 				break;
@@ -72,12 +111,48 @@ public class Ship : MonoBehaviour {
 		}
 	}
 
-    void OnTriggerEnter(Collider otherObj) {
-        if (otherObj.gameObject.name == "StarDust") {
-            this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
-            this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
-        }
-    }
+	void grabNearestCollidingObject() {
+		if (collidingObjects.Count > 0) {
+			Rigidbody body = collidingObjects[0];
+			float minDistSq = Vector3.SqrMagnitude(body.position - transform.position);
+			int minDistIndex = 0;
+			for (int i = 1; i < collidingObjects.Count; i++) {
+				float distSq = Vector3.SqrMagnitude(body.position - transform.position);
+				if (distSq < minDistSq) {
+					minDistSq = distSq;
+					minDistIndex = i;
+				}
+			}
+
+			Rigidbody heldBody = collidingObjects[minDistIndex];
+			print ("grabbed some body");
+		}
+	}
+
+	// events
+
+	void OnTriggerEnter(Collider otherObj) {
+		print (string.Format ("{0} enters", otherObj.name));
+//		if (otherObj.tag == "StarDust") {
+			collidingObjects.Add(otherObj.attachedRigidbody);
+//		}
+		if (Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+			print ("grabbed star dust");
+			heldStarDust = null;
+		}
+
+		if (otherObj.gameObject.tag == "Dust") {
+			this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
+			this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
+		}
+	}
+
+	void OnTriggerExit(Collider otherObj) {
+		print (string.Format ("{0} exits", otherObj.name));
+//		if (otherObj.tag == "StarDust") {
+		collidingObjects.Remove (otherObj.attachedRigidbody);
+//		}
+	}
 
 	Vector3 calculateShipPosition() {
 

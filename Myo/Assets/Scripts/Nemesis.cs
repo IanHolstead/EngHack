@@ -21,7 +21,14 @@ public class Nemesis : MonoBehaviour {
 	private List<Plan> plans = new List<Plan> ();
 
 	public GameObject startDust = null;
+    public GameObject passWall;
 
+    public bool endOnFailTest = true;
+    public Vector3 velocity = new Vector3 (0, 0, -5);
+
+    DustTypes nextPassWallType;
+    public int wallSpawnTime = 15;
+    float timeSinceWall = 0f;
 
 	public void createLevel(int dif){
 
@@ -124,6 +131,7 @@ public class Nemesis : MonoBehaviour {
 		
 		StarDust script = newDust.GetComponent<StarDust> ();
 		script.DustType = type;
+		script.Velocity = velocity;
 		script.startDrift ();
 		script.spin ();
 		Debug.Log ("spawn");
@@ -138,6 +146,24 @@ public class Nemesis : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        if (passWalls.Count != 0)
+        {
+            timeSinceWall = 0f;
+        }
+        else
+        {
+            timeSinceWall += Time.deltaTime;
+            if (timeSinceWall > wallSpawnTime)
+            {
+                
+            }
+        }
+        
 	}
+
+    void SpawnWall()
+    {
+        GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, 200), transform.rotation);
+        passWallInstance.GetComponent<PassWall>().Setup(nextPassWallType, endOnFailTest, velocity);
+    }
 }

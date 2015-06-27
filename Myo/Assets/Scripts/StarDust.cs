@@ -2,13 +2,8 @@
 using System.Collections;
 
 public class StarDust : MonoBehaviour {
-	Vector3 DRIFVEL = new Vector3(0, 0, -5f);
-
-
 	
-
-	public Mesh CUBE = null,SPERE = null,TRIANGLE = null;
-
+	public Mesh CUBE = null, SPERE = null, TRIANGLE = null;
 
 	public Mesh findMesh(DustTypes dustType){
 		switch (dustType) {
@@ -34,16 +29,17 @@ public class StarDust : MonoBehaviour {
 			
 		}
 	}
+	
+	public Vector3 Velocity{
+		get{return vel;}
+		set{vel = value;}
+	}
 
 	public Vector3 vel = new Vector3();
 	public Vector3 rotVel = new Vector3();
 
 	public void spin(){
 		rotVel = new Vector3(Random.Range(10f,90f),Random.Range(10f,90f),Random.Range(10f,90f));
-	}
-
-	public void startDrift(){
-		vel = DRIFVEL;
 	}
 
 	// Update is called once per frame
