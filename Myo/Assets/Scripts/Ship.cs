@@ -205,8 +205,12 @@ public class Ship : MonoBehaviour {
 
 		Vector3 eulerAngles = myo.transform.eulerAngles;
 		_myoAntiYaw = eulerAngles [1];
-        GameObject.Find("Spawner").GetComponent<UIDriver> ().clearStateText();
-        GameObject.Find("Spawner").GetComponent<UIDriver> ().showHUD(true);
+        if (GameObject.Find("Spawner").GetComponent<UIDriver>().State != UIDriver.GameState.PLAYING)
+        {
+            life = 3;
+            GameObject.Find("Spawner").GetComponent<UIDriver>().clearStateText();
+            GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(true);
+        }
 	}
 
 	//Myo math functions
