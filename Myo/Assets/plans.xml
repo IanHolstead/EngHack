@@ -9,4 +9,40 @@
 	<dust>0,2,0</dust>
 	<dust>0,-2,0</dust>
 </plan>
+<plan dif="3">
+	<dust>1,2,0</dust>
+	<dust>1,-2,0</dust>
+	<dust>2,2,0</dust>
+	<dust>2,-2,0</dust>
+	<dust>3,2,0</dust>
+	<dust>3,-2,0</dust>
+</plan>
+<plan dif="3">
+	<dust>-1,2,0</dust>
+	<dust>-1,-2,0</dust>
+	<dust>-2,2,0</dust>
+	<dust>-2,-2,0</dust>
+	<dust>-3,2,0</dust>
+	<dust>-3,-2,0</dust>
+</plan>
+<plan dif="3">
+	<dust>10,4,0</dust>
+	<dust>9,4,0</dust>
+	<dust>8,4,0</dust>
+	<dust>10,3,0</dust>
+	<dust>9,3,0</dust>
+	<dust>8,-3,0</dust>
+</plan>
+<plan dif="-2">
+	<dust type = "key">-5,0,0</dust>
+	<dust type = "key">5,0,0</dust>
+</plan>
+<plan dif="3">
+	<dust>5,0,0</dust>
+	<dust>4,0,1</dust>
+	<dust>3,0,2</dust>
+	<dust>2,0,3</dust>
+	<dust>1,0,4</dust>
+	<dust>0,0,5</dust>
+</plan>
 </plans>

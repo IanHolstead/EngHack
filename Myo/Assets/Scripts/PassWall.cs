@@ -19,6 +19,9 @@ public class PassWall : MonoBehaviour {
         transform.position = pos;
 	}
 
+	public delegate void WallRemoved(GameObject sender);
+	public event WallRemoved Removed;
+
     void OnTriggerEnter(Collider collider)
     {
         if (collider.gameObject.tag == "Player")
@@ -27,6 +30,10 @@ public class PassWall : MonoBehaviour {
         }
         if (collider.gameObject.name == "DeathWall")
         {
+			if (Removed != null)
+				Removed(this.gameObject);
+
+
             Destroy(gameObject);
         }
     }

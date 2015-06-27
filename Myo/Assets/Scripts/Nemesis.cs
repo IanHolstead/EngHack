@@ -6,19 +6,22 @@ using System.IO;
 
 public class Nemesis : MonoBehaviour {
 
-	private class Plan{
+	public class Plan{
 		public int dif;
 		public Dust[] dusts;
 	}
 
-	private class Dust{
+	public class Dust{
 		public Vector3 pos;
 		public bool key;
 	}
 
-	private List<GameObject> dust = new List<GameObject>();
-	private List<GameObject> passWalls = new List<GameObject>();
-	private List<Plan> plans = new List<Plan> ();
+	public delegate void SectionCleared(GameObject sender);
+	public event SectionCleared Cleared;
+
+	public List<GameObject> dust = new List<GameObject>();
+	public List<GameObject> passWalls = new List<GameObject>();
+	public List<Plan> plans = new List<Plan> ();
 
 	public GameObject startDust = null;
     public GameObject passWall;
@@ -44,7 +47,7 @@ public class Nemesis : MonoBehaviour {
 			createPlan(new DustTypes[]{pass},failingTypes(pass),ref zset, plans[Mathf.RoundToInt(Random.Range(0,plans.Count - 1))]);
 		}
 
-		for (int i = 0; i <10; ++i) {
+		for (int i = 0; i <50; ++i) {
 			spawnDust((DustTypes)Mathf.RoundToInt(Random.Range(0,2)),new Vector3(Mathf.RoundToInt(Random.Range(-10,10)),
 			                                                          Mathf.RoundToInt(Random.Range(-5,5)),
 			                                                          Mathf.RoundToInt(Random.Range(start,zset))));
@@ -182,6 +185,17 @@ public class Nemesis : MonoBehaviour {
 	void SpawnWall(DustTypes passWallType, float zset)
     {
 		GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, zset), Quaternion.AngleAxis(-90, new Vector3(1,0,0)));
-		passWallInstance.GetComponent<PassWall>().Setup(passWallType, endOnFailTest, velocity.z);
+		passWalls.Add (passWallInstance);
+		PassWall script = passWallInstance.GetComponent<PassWall> ();
+		script.Setup(passWallType, endOnFailTest, velocity.z);
+		script.Removed += new PassWall.WallRemoved (wallRemoved);
+
     }
+
+	void wallRemoved(GameObject sender){
+		passWalls.Remove (sender);
+
+		if (Cleared != null)
+			Cleared(this.gameObject);
+	}
 }

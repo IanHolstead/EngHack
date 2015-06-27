@@ -32,20 +32,23 @@ public class StarDust : MonoBehaviour {
 	
 	public Vector3 Velocity{
 		get{return vel;}
-		set{vel = value;}
+		set{
+			vel = value;
+			GetComponent<Rigidbody>().velocity = vel;
+		}
 	}
 
 	public Vector3 vel = new Vector3();
 	public Vector3 rotVel = new Vector3();
 
 	public void spin(){
-		rotVel = new Vector3(Random.Range(10f,90f),Random.Range(10f,90f),Random.Range(10f,90f));
+		GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(10f,90f),Random.Range(10f,90f),Random.Range(10f,90f));
 	}
 
 	// Update is called once per frame
 	void Update () {
-		this.transform.position += vel * Time.deltaTime;
-		this.transform.Rotate(rotVel * Time.deltaTime);
+//		this.transform.position += vel * Time.deltaTime;
+//		this.transform.Rotate(rotVel * Time.deltaTime);
 	}
 
 	void OnTriggerEnter(Collider otherObj) {
