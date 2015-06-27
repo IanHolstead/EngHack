@@ -26,26 +26,62 @@ public class Nemesis : MonoBehaviour {
     public bool endOnFailTest = true;
     public Vector3 velocity = new Vector3 (0, 0, -5);
 
-    DustTypes nextPassWallType;
-    public int wallSpawnTime = 15;
-    float timeSinceWall = 0f;
 
 	public void createLevel(int dif){
 
-		spawnDust (DustTypes.CUBE, new Vector3 (0, 5, 20));
-		spawnDust (DustTypes.CUBE, new Vector3 (0, -5, 20));
+		float zset = 100;
+		for (int i = 0; i <3; ++i) {
+			createSector(ref zset);
+		}
 
 	}
 
-	public void createSector(DustTypes[] pass, DustTypes[] fail, float zset){
+	public void createSector(ref float zset){
+		DustTypes pass = (DustTypes)Mathf.RoundToInt(Random.Range(0,2));
+		float start = zset;
+		for (int i = 0; i <10; ++i) {
+			createPlan(new DustTypes[]{pass},failingTypes(pass),ref zset, plans[Mathf.RoundToInt(Random.Range(0,plans.Count - 1))]);
+		}
+
+		for (int i = 0; i <10; ++i) {
+			spawnDust((DustTypes)Mathf.RoundToInt(Random.Range(0,2)),new Vector3(Mathf.RoundToInt(Random.Range(-10,10)),
+			                                                          Mathf.RoundToInt(Random.Range(-5,5)),
+			                                                          Mathf.RoundToInt(Random.Range(start,zset))));
+		}
+
+
+
+		zset += 20;
+		
+
+		SpawnWall (pass, zset);
+
+		zset += 30;
+	}
+
+	private DustTypes[] failingTypes(DustTypes passingType){
+		switch (passingType) {
+		case DustTypes.CUBE: return new DustTypes[]{DustTypes.SPERE,DustTypes.TRIANGLE};
+		case DustTypes.SPERE: return new DustTypes[]{DustTypes.CUBE,DustTypes.TRIANGLE};
+		case DustTypes.TRIANGLE: return new DustTypes[]{DustTypes.SPERE,DustTypes.CUBE};
+
+		}
+		return new DustTypes[]{};
 
 	}
 
-	private void createPlan(DustTypes[] pass, DustTypes[] fail, float zset, Plan plan){
+	private void createPlan(DustTypes[] pass, DustTypes[] fail, ref float zset, Plan plan){
 		Vector3 dpos = new Vector3 (0, 0, zset);
+		float max = 0;
 		foreach (Dust dust in plan.dusts) {
 			addTypedDust(dust.key,dust.pos + dpos, pass, fail);
+			if(dust.pos.z > max)
+				max = dust.pos.z;
 		}
+
+		max += 20;
+
+		zset += max;
 	}
 
 	private void addTypedDust(bool key, Vector3 pos, DustTypes[] pass, DustTypes[] fail){
@@ -144,7 +180,7 @@ public class Nemesis : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	/*void Update () {
         if (passWalls.Count != 0)
         {
             timeSinceWall = 0f;
@@ -158,11 +194,11 @@ public class Nemesis : MonoBehaviour {
             }
         }
         
-	}
+	}*/
 
-    void SpawnWall()
+	void SpawnWall(DustTypes passWallType, float zset)
     {
-        GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, 200), transform.rotation);
-        passWallInstance.GetComponent<PassWall>().Setup(nextPassWallType, endOnFailTest, velocity.z);
+		GameObject passWallInstance = (GameObject)Instantiate(passWall, new Vector3(0, 0, zset), Quaternion.AngleAxis(-90, new Vector3(1,0,0)));
+		passWallInstance.GetComponent<PassWall>().Setup(passWallType, endOnFailTest, velocity.z);
     }
 }
