@@ -137,7 +137,6 @@ public class Ship : MonoBehaviour {
 	// events
 
 	void OnTriggerEnter(Collider otherObj) {
-		
 		if (otherObj.gameObject.tag == "Dust") {
 			collidingObjects.Add(otherObj.attachedRigidbody);
 			if (heldObject == null && 
@@ -149,7 +148,30 @@ public class Ship : MonoBehaviour {
 				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
 				Destroy (otherObj.gameObject);
 			}
-		}
+        }
+        else if (otherObj.gameObject.tag == "PassWall")
+        {
+            if (type != otherObj.GetComponent<PassWall>().type)
+            {
+                life--;
+                if (life <= 0)
+                {
+                    if ((GameObject.Find("Player1").GetComponent<Ship>().Life <= 0))
+                    {
+                        GameObject.Find("Spawner").GetComponent<UIDriver>().showEndText(true);
+                    }
+                    else
+                    {
+                        GameObject.Find("Spawner").GetComponent<UIDriver>().showEndText(false);
+                    }
+                    GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(false);
+                }
+                else
+                {
+                    GameObject.Find("Spawner").GetComponent<UIDriver>().showHUD(true);
+                }
+            }
+        }
 	}
 
 	void OnTriggerExit(Collider otherObj) {

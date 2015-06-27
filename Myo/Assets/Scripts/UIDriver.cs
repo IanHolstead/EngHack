@@ -9,33 +9,18 @@ public class UIDriver : MonoBehaviour {
     {
         showStartText();
         showHUD(false);
-        showGateWarning(prevPassWall, false);
+        showGateWarning(false);
+
+        GameObject.Find("Spawner").GetComponent<Nemesis>().Cleared += new Nemesis.SectionCleared(updatePassWall);
     }
 
-    // Update is called once per frame
-    void Update() {
-
-        if (prevPassWall != GameObject.Find("Spawner").GetComponent<Nemesis>().passWalls[0].GetComponent<PassWall> ().type)
-        {
-            prevPassWall = GameObject.Find("Spawner").GetComponent<Nemesis>().passWalls[0].GetComponent<PassWall>().type;
-            showGateWarning(prevPassWall, true);
-        }
-
-        if (GameObject.Find("Player1").GetComponent<Ship> ().Life <= 0)
-        {
-            showGateWarning(prevPassWall, false);
-            showHUD(false);
-            showEndText(true);
-        }
-        else if (GameObject.Find("Player2").GetComponent<Ship>().Life <= 0)
-        {
-            showGateWarning(prevPassWall, false);
-            showHUD(false);
-            showEndText(false);
-        }
+    private void updatePassWall(GameObject obj)
+    {
+        prevPassWall = obj.GetComponent<Nemesis> ().passWalls[0].GetComponent<PassWall> ().type;
+        showGateWarning(true);
     }
 
-    private void showStartText()
+    public void showStartText()
     {
         GameObject.Find("State text").GetComponent<TextMesh>().text = "Punch The Screen\nTo Begin";
     }
@@ -71,7 +56,7 @@ public class UIDriver : MonoBehaviour {
         }
     }
 
-    private void showGateWarning(DustTypes type, bool visible)
+    public void showGateWarning(bool visible)
     {
         Color colour = GameObject.Find("Gate Cube").GetComponent<Renderer>().material.color;
         colour.a = 0;
@@ -87,7 +72,7 @@ public class UIDriver : MonoBehaviour {
 
         if (visible)
         {
-            switch (type)
+            switch (prevPassWall)
             {
                 case DustTypes.CUBE:
                     colour = GameObject.Find("Gate Cube").GetComponent<Renderer>().material.color;
@@ -108,7 +93,7 @@ public class UIDriver : MonoBehaviour {
         }
     }
 
-    private void showEndText(bool p1Death)
+    public void showEndText(bool p1Death)
     {
         if (p1Death) {
             GameObject.Find("State text").GetComponent<TextMesh>().text = "Player 2 Has Died\nPunch The Screen\nTo Play Again";
