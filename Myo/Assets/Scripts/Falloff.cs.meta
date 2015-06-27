@@ -1,11 +1,10 @@
 fileFormatVersion: 2
-guid: 42bfcdcbc8b44244a88a823705032020
-timeCreated: 1435380895
+guid: 1bf3d19974b0e224b8e967e2486e53e7
+timeCreated: 1435381267
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences:
-  - startDust: {fileID: 157120, guid: 82f419dd8db452e43b06fa19a84ccf72, type: 2}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
