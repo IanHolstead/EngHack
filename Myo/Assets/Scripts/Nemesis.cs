@@ -35,22 +35,33 @@ public class Nemesis : MonoBehaviour {
 
 		float zset = 100;
 		for (int i = 0; i <3; ++i) {
-			createSector(ref zset);
+			createSector(ref zset, dif);
 		}
 
 	}
 
-	public void createSector(ref float zset){
-		DustTypes pass = (DustTypes)Mathf.RoundToInt(Random.Range(0,2));
+	public void createSector(ref float zset, int dif){
+		DustTypes pass = (DustTypes)Random.Range(0,3);
 		float start = zset;
-		for (int i = 0; i <10; ++i) {
-			createPlan(new DustTypes[]{pass},failingTypes(pass),ref zset, plans[Mathf.RoundToInt(Random.Range(0,plans.Count - 1))]);
+		DustTypes[] failing = failingTypes (pass);
+
+		if (plans.Count > 0) {
+			for (int i = 0; i <10; ++i) {
+				createPlan(new DustTypes[]{pass}, failing, ref zset, plans[Random.Range(0,plans.Count)]);
+			}
+
 		}
 
-		for (int i = 0; i <50; ++i) {
-			spawnDust((DustTypes)Mathf.RoundToInt(Random.Range(0,2)),new Vector3(Mathf.RoundToInt(Random.Range(-10,10)),
-			                                                          Mathf.RoundToInt(Random.Range(-5,5)),
-			                                                          Mathf.RoundToInt(Random.Range(start,zset))));
+		for (int i = 0; i <5; ++i) {
+			spawnDust(pass,new Vector3(Random.Range(-10.0f,10.0f),
+			                           Random.Range(-5.0f,5.0f),
+			                           Random.Range(start,zset)));
+		}
+
+		for (int i = 0; i <40; ++i) {
+			spawnDust(failing[Random.Range(0,failing.Length)],new Vector3(Random.Range(-10.0f,10.0f),
+			                                                   				Random.Range(-5.0f,5.0f),
+			                                                   				Random.Range(start,zset)));
 		}
 
 
@@ -90,9 +101,10 @@ public class Nemesis : MonoBehaviour {
 
 	private void addTypedDust(bool key, Vector3 pos, DustTypes[] pass, DustTypes[] fail){
 		if (key && (pass.Length > 0)) {
-			spawnDust(pass[Mathf.RoundToInt(Random.Range(0,pass.Length - 1))],pos);
+			spawnDust(pass[Random.Range(0,pass.Length)],pos);
 		} else if (!key && (fail.Length > 0)) {
-			spawnDust(fail[Mathf.RoundToInt(Random.Range(0,fail.Length - 1))],pos);
+
+			spawnDust(fail[Random.Range(0,fail.Length)],pos);
 		}
 
 	}
