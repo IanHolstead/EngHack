@@ -11,7 +11,8 @@ public class Ship : MonoBehaviour {
 
 	private readonly float MAX_YAW = 45.0f;
 	private readonly float MAX_PITCH = 45.0f;
-	private readonly float MAX_VELOCITY = 3.0f;
+	private readonly float MAX_VELOCITY = 40.0f;
+	private readonly float MAX_ACCEL = 400.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
     
     private DustTypes type = DustTypes.CUBE;
@@ -19,6 +20,7 @@ public class Ship : MonoBehaviour {
 
 	private readonly float HOLD_TIME_LENIENCY = 2.0f;
 	private readonly float HOLD_DISTANCE = 1.0f;
+	private readonly float HOLD_VELOCITY_FACTOR = 0.2f;
 	private readonly float THROW_VELOCITY = 10.0f;
 
     public GameObject myo = null;
@@ -70,12 +72,19 @@ public class Ship : MonoBehaviour {
 		}
 
 		Vector3 targetPos = calculateShipPosition ();
-		Vector3 velocity = targetPos - transform.position;
-		if (velocity.magnitude > MAX_VELOCITY) {
-			velocity = velocity * velocity.magnitude / MAX_VELOCITY;
+		Vector3 accelTick = targetPos - transform.position;
+		if (accelTick.magnitude > MAX_ACCEL * Time.deltaTime) {
+			accelTick = accelTick * accelTick.magnitude / (MAX_ACCEL * Time.deltaTime);
 		}
-		GetComponent<Rigidbody> ().AddForce (velocity, ForceMode.VelocityChange);
-
+		GetComponent<Rigidbody> ().AddForce (accelTick, ForceMode.VelocityChange);
+		Vector3 finalVelocity = GetComponent<Rigidbody> ().velocity;
+		if (finalVelocity.sqrMagnitude > MAX_VELOCITY * MAX_VELOCITY) {
+			finalVelocity = finalVelocity / finalVelocity.magnitude * MAX_VELOCITY;
+		}
+		if (heldObject != null) {
+			finalVelocity *= HOLD_VELOCITY_FACTOR;
+		}
+		GetComponent<Rigidbody> ().velocity = finalVelocity;
 
 		float roll = calculateShipRoll ();
 		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
