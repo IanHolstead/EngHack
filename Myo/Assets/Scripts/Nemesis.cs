@@ -14,7 +14,7 @@ public class Nemesis : MonoBehaviour {
 
 		//GameObject newDust = Instantiate<GameObject> (startDust);
 
-		GameObject newDust = (GameObject)Instantiate(startDust,new Vector3 (5, 0, 0),Quaternion.identity);
+		GameObject newDust = (GameObject)Instantiate(startDust,new Vector3 (5, 0, 100),Quaternion.identity);
 
 		StarDust script = newDust.GetComponent<StarDust> ();
 		script.DustType = DustTypes.SPERE;
