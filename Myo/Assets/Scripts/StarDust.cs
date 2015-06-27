@@ -17,6 +17,9 @@ public class StarDust : MonoBehaviour {
 		return null;
 	}
 
+	public delegate void DustRemoved(GameObject sender);
+	public event DustRemoved Removed;
+
 
 	private DustTypes dustType = DustTypes.CUBE;
 
@@ -55,6 +58,8 @@ public class StarDust : MonoBehaviour {
 
 		if (otherObj.gameObject.name == "DeathWall") {
 			Destroy(this.gameObject);
+			if (Removed != null)
+				Removed(this.gameObject);
 		}
 	}
 }
