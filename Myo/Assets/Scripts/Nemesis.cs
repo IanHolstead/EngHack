@@ -12,13 +12,14 @@ public class Nemesis : MonoBehaviour {
 
 	public void createLevel(){
 
-		GameObject newDust = GameObject.Instantiate<GameObject> (startDust);
+		//GameObject newDust = Instantiate<GameObject> (startDust);
 
-		newDust.transform.position = new Vector3 (0, 0, 100);
+		GameObject newDust = (GameObject)Instantiate(startDust,new Vector3 (5, 0, 0),Quaternion.identity);
 
 		StarDust script = newDust.GetComponent<StarDust> ();
-		script.DustType = DustTypes.CUBE;
+		script.DustType = DustTypes.SPERE;
 		script.startDrift ();
+		Debug.Log ("spawn");
 
 	}
 
