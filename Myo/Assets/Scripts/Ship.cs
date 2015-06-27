@@ -11,7 +11,7 @@ public class Ship : MonoBehaviour {
 
 	private readonly float MAX_YAW = 45.0f;
 	private readonly float MAX_PITCH = 45.0f;
-	private readonly float MAX_VELOCITY = 40.0f;
+	private readonly float MAX_VELOCITY = 80.0f;
 	private readonly float MAX_ACCEL = 400.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
     
@@ -72,19 +72,20 @@ public class Ship : MonoBehaviour {
 		}
 
 		Vector3 targetPos = calculateShipPosition ();
-		Vector3 accelTick = targetPos - transform.position;
-		if (accelTick.magnitude > MAX_ACCEL * Time.deltaTime) {
-			accelTick = accelTick * accelTick.magnitude / (MAX_ACCEL * Time.deltaTime);
-		}
-		GetComponent<Rigidbody> ().AddForce (accelTick, ForceMode.VelocityChange);
-		Vector3 finalVelocity = GetComponent<Rigidbody> ().velocity;
-		if (finalVelocity.sqrMagnitude > MAX_VELOCITY * MAX_VELOCITY) {
-			finalVelocity = finalVelocity / finalVelocity.magnitude * MAX_VELOCITY;
-		}
-		if (heldObject != null) {
-			finalVelocity *= HOLD_VELOCITY_FACTOR;
-		}
-		GetComponent<Rigidbody> ().velocity = finalVelocity;
+//		Vector3 accelTick = targetPos - transform.position;
+//		if (accelTick.magnitude > MAX_ACCEL * Time.deltaTime) {
+//			accelTick = accelTick * accelTick.magnitude / (MAX_ACCEL * Time.deltaTime);
+//		}
+//		GetComponent<Rigidbody> ().AddForce (accelTick, ForceMode.VelocityChange);
+//		Vector3 finalVelocity = GetComponent<Rigidbody> ().velocity;
+//		if (finalVelocity.sqrMagnitude > MAX_VELOCITY * MAX_VELOCITY) {
+//			finalVelocity = finalVelocity / finalVelocity.magnitude * MAX_VELOCITY;
+//		}
+		Vector3 dist = targetPos - transform.position;
+		Vector3 finalVelocity;
+		float velocityFactor = (heldObject == null)? 1.0f : HOLD_VELOCITY_FACTOR;
+		velocityFactor *= (1 - Mathf.Exp(-dist.magnitude));
+		GetComponent<Rigidbody>().velocity = dist / dist.magnitude * MAX_VELOCITY * velocityFactor;
 
 		float roll = calculateShipRoll ();
 		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
