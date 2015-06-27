@@ -14,6 +14,8 @@ public class Ship : MonoBehaviour {
 	private readonly float MAX_VELOCITY = 80.0f;
 	private readonly float MAX_ACCEL = 400.0f;
 	private readonly Vector3 MAX_POS = new Vector3 (10f, 5.5f, 0);
+
+	private readonly float COLLISION_RADIUS = 0.6f;
     
     private DustTypes type = DustTypes.CUBE;
     private int life = 3;
@@ -134,11 +136,12 @@ public class Ship : MonoBehaviour {
 	void OnTriggerEnter(Collider otherObj) {
 		if (otherObj.gameObject.tag == "Dust") {
 			collidingObjects.Add(otherObj.attachedRigidbody);
-			if (heldObject == null && 
-			   		Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY) {
+			if (heldObject == null
+			    && Time.realtimeSinceStartup - holdRequestInitateTime < HOLD_TIME_LENIENCY
+			    && (transform.position - otherObj.attachedRigidbody.transform.position).magnitude > COLLISION_RADIUS) {
 				print ("grabbed star dust");
 				heldObject = otherObj.attachedRigidbody;
-			} else {
+			} else if ((transform.position - otherObj.attachedRigidbody.transform.position).magnitude <= COLLISION_RADIUS ){
 				this.type = otherObj.gameObject.GetComponent<StarDust>().DustType;
 				this.GetComponent<MeshFilter>().mesh = otherObj.gameObject.GetComponent<StarDust>().findMesh(type);
 				Destroy (otherObj.gameObject);
