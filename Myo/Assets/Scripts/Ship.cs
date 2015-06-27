@@ -72,15 +72,6 @@ public class Ship : MonoBehaviour {
 		}
 
 		Vector3 targetPos = calculateShipPosition ();
-//		Vector3 accelTick = targetPos - transform.position;
-//		if (accelTick.magnitude > MAX_ACCEL * Time.deltaTime) {
-//			accelTick = accelTick * accelTick.magnitude / (MAX_ACCEL * Time.deltaTime);
-//		}
-//		GetComponent<Rigidbody> ().AddForce (accelTick, ForceMode.VelocityChange);
-//		Vector3 finalVelocity = GetComponent<Rigidbody> ().velocity;
-//		if (finalVelocity.sqrMagnitude > MAX_VELOCITY * MAX_VELOCITY) {
-//			finalVelocity = finalVelocity / finalVelocity.magnitude * MAX_VELOCITY;
-//		}
 		Vector3 dist = targetPos - transform.position;
 		Vector3 finalVelocity;
 		float velocityFactor = (heldObject == null)? 1.0f : HOLD_VELOCITY_FACTOR;
@@ -91,6 +82,9 @@ public class Ship : MonoBehaviour {
 		transform.rotation = Quaternion.AngleAxis (roll, new Vector3 (0, 0, 1));
 
 		updateHeldObject ();
+		holdRequestIsActive = (Time.realtimeSinceStartup - holdRequestInitateTime) < HOLD_TIME_LENIENCY;
+		Behaviour halo = (Behaviour)GetComponent ("Halo");
+		halo.enabled = holdRequestIsActive;
 		
 
 		//check for pose changes
