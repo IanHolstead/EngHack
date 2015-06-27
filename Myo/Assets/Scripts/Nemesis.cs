@@ -19,6 +19,9 @@ public class Nemesis : MonoBehaviour {
 	public delegate void SectionCleared(GameObject sender);
 	public event SectionCleared Cleared;
 
+	public delegate void LevelFinnished(GameObject sender);
+	public event SectionCleared Finnished;
+
 	public List<GameObject> dust = new List<GameObject>();
 	public List<GameObject> passWalls = new List<GameObject>();
 	public List<Plan> plans = new List<Plan> ();
@@ -179,12 +182,36 @@ public class Nemesis : MonoBehaviour {
 
 	public void spawnDust(DustTypes type,Vector3 pos){
 		GameObject newDust = (GameObject)Instantiate(startDust, pos, Quaternion.identity);
-		
+		dust.Add (newDust);
+
 		StarDust script = newDust.GetComponent<StarDust> ();
+		script.Removed += new StarDust.DustRemoved (dustRemoved);
 		script.DustType = type;
 		script.Velocity = velocity;
 		script.spin ();
 
+	}
+	void dustRemoved (GameObject sender){
+		dust.Remove (sender);
+	}
+
+	public void removeAllDust(){
+		foreach (GameObject dustish in dust) {
+			Destroy (dustish);
+		}
+		dust.Clear ();
+	}
+
+	public void removeAllPassWalls(){
+		foreach (GameObject passWall in passWalls) {
+			Destroy (passWall);
+		}
+		passWalls.Clear ();
+	}
+
+	public void removeAll(){
+		removeAllDust ();
+		removeAllPassWalls ();
 	}
 
 	// Use this for initialization
@@ -208,5 +235,8 @@ public class Nemesis : MonoBehaviour {
 
 		if (Cleared != null)
 			Cleared(this.gameObject);
+
+		if (passWalls.Count == 0 && Finnished != null)
+			Finnished(this.gameObject);
 	}
 }
